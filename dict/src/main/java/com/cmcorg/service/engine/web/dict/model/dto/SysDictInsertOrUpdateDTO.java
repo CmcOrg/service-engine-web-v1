@@ -1,6 +1,6 @@
 package com.cmcorg.service.engine.web.dict.model.dto;
 
-import com.cmcorg.engine.web.model.model.annotation.RequestField;
+import com.cmcorg.engine.web.model.generate.model.annotation.RequestField;
 import com.cmcorg.engine.web.model.model.dto.BaseInsertOrUpdateDTO;
 import com.cmcorg.service.engine.web.dict.model.enums.SysDictTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;

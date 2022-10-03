@@ -1,10 +1,10 @@
 package com.cmcorg.service.engine.web.param.model.entity;
 
 import com.baomidou.mybatisplus.annotation.TableName;
-import com.cmcorg.engine.web.auth.model.constant.WebModelConstant;
 import com.cmcorg.engine.web.auth.model.entity.BaseEntity;
-import com.cmcorg.engine.web.model.model.annotation.RequestClass;
-import com.cmcorg.engine.web.model.model.annotation.RequestField;
+import com.cmcorg.engine.web.model.generate.model.annotation.RequestClass;
+import com.cmcorg.engine.web.model.generate.model.annotation.RequestField;
+import com.cmcorg.engine.web.model.generate.model.constant.WebModelConstant;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

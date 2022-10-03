@@ -1,8 +1,8 @@
 package com.cmcorg.service.engine.web.menu.model.dto;
 
-import com.cmcorg.engine.web.model.model.annotation.RequestField;
+import com.cmcorg.engine.web.model.generate.model.annotation.RequestField;
+import com.cmcorg.engine.web.model.generate.model.enums.FormInputTypeEnum;
 import com.cmcorg.engine.web.model.model.dto.BaseInsertOrUpdateDTO;
-import com.cmcorg.engine.web.model.model.enums.FormInputTypeEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

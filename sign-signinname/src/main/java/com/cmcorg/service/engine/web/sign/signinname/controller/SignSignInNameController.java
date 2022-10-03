@@ -2,8 +2,8 @@ package com.cmcorg.service.engine.web.sign.signinname.controller;
 
 import com.cmcorg.engine.web.auth.exception.BaseBizCodeEnum;
 import com.cmcorg.engine.web.auth.model.vo.ApiResultVO;
-import com.cmcorg.engine.web.model.model.annotation.WebPage;
-import com.cmcorg.engine.web.model.model.enums.PageTypeEnum;
+import com.cmcorg.engine.web.model.generate.model.annotation.WebPage;
+import com.cmcorg.engine.web.model.generate.model.enums.PageTypeEnum;
 import com.cmcorg.service.engine.web.sign.signinname.mode.dto.*;
 import com.cmcorg.service.engine.web.sign.signinname.service.SignSignInNameService;
 import io.swagger.v3.oas.annotations.Operation;

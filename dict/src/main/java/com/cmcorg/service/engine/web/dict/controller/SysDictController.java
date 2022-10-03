@@ -2,11 +2,11 @@ package com.cmcorg.service.engine.web.dict.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cmcorg.engine.web.auth.model.vo.ApiResultVO;
-import com.cmcorg.engine.web.model.model.annotation.WebPage;
+import com.cmcorg.engine.web.model.generate.model.annotation.WebPage;
+import com.cmcorg.engine.web.model.generate.model.enums.PageTypeEnum;
 import com.cmcorg.engine.web.model.model.dto.AddOrderNoDTO;
 import com.cmcorg.engine.web.model.model.dto.NotEmptyIdSet;
 import com.cmcorg.engine.web.model.model.dto.NotNullId;
-import com.cmcorg.engine.web.model.model.enums.PageTypeEnum;
 import com.cmcorg.service.engine.web.dict.model.dto.SysDictInsertOrUpdateDTO;
 import com.cmcorg.service.engine.web.dict.model.dto.SysDictPageDTO;
 import com.cmcorg.service.engine.web.dict.model.entity.SysDictDO;

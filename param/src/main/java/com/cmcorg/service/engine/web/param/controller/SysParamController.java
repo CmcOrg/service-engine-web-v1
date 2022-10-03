@@ -2,10 +2,10 @@ package com.cmcorg.service.engine.web.param.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cmcorg.engine.web.auth.model.vo.ApiResultVO;
-import com.cmcorg.engine.web.model.model.annotation.WebPage;
+import com.cmcorg.engine.web.model.generate.model.annotation.WebPage;
+import com.cmcorg.engine.web.model.generate.model.enums.PageTypeEnum;
 import com.cmcorg.engine.web.model.model.dto.NotEmptyIdSet;
 import com.cmcorg.engine.web.model.model.dto.NotNullId;
-import com.cmcorg.engine.web.model.model.enums.PageTypeEnum;
 import com.cmcorg.service.engine.web.param.model.dto.SysParamInsertOrUpdateDTO;
 import com.cmcorg.service.engine.web.param.model.dto.SysParamPageDTO;
 import com.cmcorg.service.engine.web.param.model.entity.SysParamDO;
