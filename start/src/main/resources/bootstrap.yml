@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: auth-nacos
+    name: service-engine-web-v1
   cloud:
     nacos:
       server-addr: 139.196.121.3:8848
