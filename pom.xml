@@ -15,11 +15,28 @@
 
     <modules>
         <module>start</module>
+        <module>menu</module>
+        <module>role</module>
     </modules>
 
-    <dependencies>
+    <dependencyManagement>
+        <dependencies>
 
+            <!-- role -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>role</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
-    </dependencies>
+            <!-- menu -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>menu</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
 
 </project>
