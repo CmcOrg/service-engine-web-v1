@@ -23,11 +23,15 @@ public class SysUserPageVO {
     @Schema(description = "邮箱，备注：会脱敏")
     private String email;
 
+    @RequestField(formTitle = "登录名")
     @Schema(description = "登录名，会脱敏")
     private String signInName;
 
     @Schema(description = "正常/冻结")
     private Boolean enableFlag;
+
+    @Schema(description = "是否有密码")
+    private Boolean passwordFlag;
 
     @Schema(description = "创建时间")
     private Date createTime;
@@ -35,9 +39,7 @@ public class SysUserPageVO {
     @Schema(description = "修改时间")
     private Date updateTime;
 
-    @Schema(description = "是否有密码")
-    private Boolean passwordFlag;
-
+    @RequestField(tableIgnoreFlag = true)
     @Schema(description = "角色 idSet")
     private Set<Long> roleIdSet;
 
