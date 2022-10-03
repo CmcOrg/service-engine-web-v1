@@ -1,5 +1,6 @@
 package com.cmcorg.service.engine.web.user.model.dto;
 
+import com.cmcorg.engine.web.model.generate.model.annotation.RequestField;
 import com.cmcorg.engine.web.model.model.constant.BaseRegexConstant;
 import com.cmcorg.engine.web.model.model.dto.BaseInsertOrUpdateDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -25,9 +26,11 @@ public class SysUserInsertOrUpdateDTO extends BaseInsertOrUpdateDTO {
     @Schema(description = "邮箱")
     private String email;
 
+    @RequestField(formIgnoreFlag = true)
     @Schema(description = "前端加密之后的密码")
     private String password;
 
+    @RequestField(formIgnoreFlag = true)
     @Schema(description = "前端加密之后的原始密码")
     private String origPassword;
 
@@ -45,6 +48,7 @@ public class SysUserInsertOrUpdateDTO extends BaseInsertOrUpdateDTO {
     @Schema(description = "正常/冻结")
     private Boolean enableFlag;
 
+    @RequestField(formTitle = "绑定角色")
     @Schema(description = "角色 idSet")
     private Set<Long> roleIdSet;
 
