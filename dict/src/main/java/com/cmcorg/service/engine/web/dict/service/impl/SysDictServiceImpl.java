@@ -128,8 +128,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDictDO> im
         if (dictItemList.size() == 0) {
             // 如果没有字典项类型数据，则直接返回
             for (SysDictDO item : records) {
-                SysDictTreeVO treeVO = BeanUtil.copyProperties(item, SysDictTreeVO.class);
-                resList.add(treeVO);
+                resList.add(BeanUtil.copyProperties(item, SysDictTreeVO.class));
             }
             return resList;
         }
@@ -150,8 +149,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDictDO> im
         allDictList.addAll(sysDictDOList);
 
         for (SysDictDO item : allDictList) {
-            SysDictTreeVO treeVO = BeanUtil.copyProperties(item, SysDictTreeVO.class);
-            resList.add(treeVO);
+            resList.add(BeanUtil.copyProperties(item, SysDictTreeVO.class));
         }
 
         // 封装 children
