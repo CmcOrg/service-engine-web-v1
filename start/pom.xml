@@ -18,35 +18,30 @@
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>user</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- dict -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>dict</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- param -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>param</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- sign-email -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>sign-email</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- sign-signinname -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>sign-signinname</artifactId>
-            <version>${project.version}</version>
         </dependency>
 
         <!-- role -->
