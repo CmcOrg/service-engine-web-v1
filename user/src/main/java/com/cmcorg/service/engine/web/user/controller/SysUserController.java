@@ -2,6 +2,8 @@ package com.cmcorg.service.engine.web.user.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.cmcorg.engine.web.auth.model.vo.ApiResultVO;
+import com.cmcorg.engine.web.model.generate.model.annotation.WebPage;
+import com.cmcorg.engine.web.model.generate.model.enums.PageTypeEnum;
 import com.cmcorg.engine.web.model.model.dto.NotEmptyIdSet;
 import com.cmcorg.engine.web.model.model.dto.NotNullId;
 import com.cmcorg.engine.web.model.model.vo.DictLongListVO;
@@ -24,6 +26,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 import java.util.List;
 
+@WebPage(type = PageTypeEnum.ADMIN, title = "用户管理")
 @RestController
 @RequestMapping(value = "/sysUser")
 @Tag(name = "用户-管理")

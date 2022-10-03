@@ -1,5 +1,6 @@
 package com.cmcorg.service.engine.web.user.model.vo;
 
+import com.cmcorg.engine.web.model.generate.model.annotation.RequestField;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -18,6 +19,7 @@ public class SysUserPageVO {
     @Schema(description = "头像uri")
     private String avatarUri;
 
+    @RequestField(formTitle = "邮箱")
     @Schema(description = "邮箱，备注：会脱敏")
     private String email;
 
