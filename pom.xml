@@ -17,6 +17,9 @@
         <module>start</module>
         <module>menu</module>
         <module>role</module>
+        <module>param</module>
+        <module>dict</module>
+        <module>user</module>
     </modules>
 
     <dependencyManagement>
