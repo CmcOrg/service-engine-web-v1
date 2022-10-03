@@ -112,7 +112,7 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDictDO> im
     @Override
     public List<SysDictTreeVO> tree(SysDictPageDTO dto) {
 
-        dto.setPageSize(-1L); // 不分页
+        dto.setPageSize(-1); // 不分页
         List<SysDictDO> records = myPage(dto).getRecords();
 
         List<SysDictTreeVO> resList = new ArrayList<>();

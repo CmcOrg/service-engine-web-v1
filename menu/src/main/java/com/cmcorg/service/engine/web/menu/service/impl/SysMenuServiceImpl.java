@@ -164,7 +164,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuDO> im
         List<SysMenuDO> resList = new ArrayList<>();
 
         // 根据条件进行筛选，得到符合条件的数据，然后再逆向生成整棵树，并返回这个树结构
-        dto.setPageSize(-1L); // 不分页
+        dto.setPageSize(-1); // 不分页
         List<SysMenuDO> sysMenuDOList = myPage(dto).getRecords();
 
         if (sysMenuDOList.size() == 0) {
