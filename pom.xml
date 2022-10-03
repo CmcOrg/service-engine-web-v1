@@ -84,6 +84,16 @@
                 <version>${project.version}</version>
             </dependency>
 
+            <!-- 其他依赖 ↓ -->
+
+            <!-- generate-page-h5 -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>generate-page-h5</artifactId>
+                <version>${project.version}</version>
+                <scope>provided</scope>
+            </dependency>
+
             <!-- auth-nacos -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -97,6 +107,8 @@
                 <artifactId>email</artifactId>
                 <version>${project.version}</version>
             </dependency>
+
+            <!-- 其他依赖 ↑ -->
 
         </dependencies>
     </dependencyManagement>
