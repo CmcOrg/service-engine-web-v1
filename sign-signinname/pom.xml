@@ -9,27 +9,21 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>user</artifactId>
-    <description>user</description>
+    <artifactId>sign-signinname</artifactId>
+    <description>登录名登录注册</description>
 
     <dependencies>
-
-        <!-- sign-helper -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>sign-helper</artifactId>
-        </dependency>
-
-        <!-- role -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>role</artifactId>
-        </dependency>
 
         <!-- auth-nacos -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>auth-nacos</artifactId>
+        </dependency>
+
+        <!-- sign-helper -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>sign-helper</artifactId>
         </dependency>
 
     </dependencies>

@@ -10,6 +10,16 @@
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>param</artifactId>
+    <description>param</description>
 
+    <dependencies>
+
+        <!-- auth-nacos -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>auth-nacos</artifactId>
+        </dependency>
+
+    </dependencies>
 
 </project>

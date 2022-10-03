@@ -17,6 +17,9 @@
         <module>start</module>
         <module>menu</module>
         <module>role</module>
+        <module>sign-helper</module>
+        <module>sign-signinname</module>
+        <module>sign-email</module>
         <module>param</module>
         <module>dict</module>
         <module>user</module>
@@ -24,6 +27,48 @@
 
     <dependencyManagement>
         <dependencies>
+
+            <!-- user -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>user</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- dict -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>dict</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- param -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>param</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- sign-email -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sign-email</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- sign-signinname -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sign-signinname</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <!-- sign-helper -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>sign-helper</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- role -->
             <dependency>
