@@ -134,7 +134,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
             dto.setPassword(MyRsaUtil.rsaDecrypt(dto.getPassword(), paramValue));
 
             if (!ReUtil.isMatch(BaseRegexConstant.PASSWORD_REGEXP, dto.getOrigPassword())) {
-                ApiResultVO.error(BaseBizCodeEnum.PASSWORD_RESTRICTIONS); // 不合法直接抛出异常
+                ApiResultVO.error(
+                    com.cmcorg.service.engine.web.sign.helper.exception.BizCodeEnum.PASSWORD_RESTRICTIONS); // 不合法直接抛出异常
             }
         }
 
@@ -325,7 +326,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
             dto.setNewPassword(MyRsaUtil.rsaDecrypt(dto.getNewPassword(), paramValue));
 
             if (!ReUtil.isMatch(BaseRegexConstant.PASSWORD_REGEXP, dto.getNewOrigPassword())) {
-                ApiResultVO.error(BaseBizCodeEnum.PASSWORD_RESTRICTIONS); // 不合法直接抛出异常
+                ApiResultVO.error(
+                    com.cmcorg.service.engine.web.sign.helper.exception.BizCodeEnum.PASSWORD_RESTRICTIONS); // 不合法直接抛出异常
             }
 
             password = PasswordConvertUtil.convert(dto.getNewPassword(), true);

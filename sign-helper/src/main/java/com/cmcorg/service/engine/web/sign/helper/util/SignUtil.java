@@ -139,7 +139,7 @@ public class SignUtil {
             origPassword = MyRsaUtil.rsaDecrypt(origPassword, paramValue);
 
             if (!ReUtil.isMatch(BaseRegexConstant.PASSWORD_REGEXP, origPassword)) {
-                ApiResultVO.error(BaseBizCodeEnum.PASSWORD_RESTRICTIONS); // 不合法直接抛出异常
+                ApiResultVO.error(BizCodeEnum.PASSWORD_RESTRICTIONS); // 不合法直接抛出异常
             }
 
         }
@@ -314,7 +314,7 @@ public class SignUtil {
         origNewPassword = MyRsaUtil.rsaDecrypt(origNewPassword, paramValue);
 
         if (!ReUtil.isMatch(BaseRegexConstant.PASSWORD_REGEXP, origNewPassword)) {
-            ApiResultVO.error(BaseBizCodeEnum.PASSWORD_RESTRICTIONS); // 不合法直接抛出异常
+            ApiResultVO.error(BizCodeEnum.PASSWORD_RESTRICTIONS); // 不合法直接抛出异常
         }
 
         String account = getAccountByIdAndRedisKeyEnum(redisKeyEnum, currentUserIdNotAdmin);
@@ -494,7 +494,7 @@ public class SignUtil {
         origNewPassword = MyRsaUtil.rsaDecrypt(origNewPassword, paramValue);
 
         if (!ReUtil.isMatch(BaseRegexConstant.PASSWORD_REGEXP, origNewPassword)) {
-            ApiResultVO.error(BaseBizCodeEnum.PASSWORD_RESTRICTIONS); // 不合法直接抛出异常
+            ApiResultVO.error(BizCodeEnum.PASSWORD_RESTRICTIONS); // 不合法直接抛出异常
         }
 
         String key = redisKeyEnum.name() + account;

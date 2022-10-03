@@ -16,6 +16,7 @@ public enum BizCodeEnum implements IBizCode {
     USER_DOES_NOT_EXIST(300071, "操作失败：用户不存在"), //
     PASSWORD_NOT_VALID(300081, "操作失败：当前密码错误"), //
     THE_ACCOUNT_HAS_ALREADY_BEEN_REGISTERED(300091, "操作失败：该账号已被注册，请重试"), //
+    PASSWORD_RESTRICTIONS(300101, "密码限制：必须包含大小写字母和数字，可以使用特殊字符，长度8-20"), //
     ;
 
     private int code;
