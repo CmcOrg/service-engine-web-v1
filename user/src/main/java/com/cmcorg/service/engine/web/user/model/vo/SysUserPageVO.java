@@ -13,6 +13,7 @@ public class SysUserPageVO {
     @Schema(description = "主键id")
     private Long id;
 
+    @RequestField(formDeleteNameFlag = true)
     @Schema(description = "昵称")
     private String nickname;
 
