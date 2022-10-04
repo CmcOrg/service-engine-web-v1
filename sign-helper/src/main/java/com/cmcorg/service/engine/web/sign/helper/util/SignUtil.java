@@ -281,12 +281,10 @@ public class SignUtil {
      */
     private static void checkLoginBlack(Long id) {
 
-        String key = RedisKeyEnum.PRE_LOGIN_BLACK.name() + id;
-        boolean exists = redissonClient.getBucket(key).isExists();
-        if (exists) {
+        String lockMessage = redissonClient.<Long, String>getMap(RedisKeyEnum.PRE_LOGIN_BLACK.name()).get(id);
+        if (StrUtil.isNotBlank(lockMessage)) {
             ApiResultVO.error(BizCodeEnum.TOO_MANY_LOGIN_FAILURES);
         }
-
     }
 
     /**
@@ -303,7 +301,7 @@ public class SignUtil {
         }
         if (count > 10) {
             // 超过十次密码错误，则封禁账号，下次再错误，则才会提示
-            redissonClient.getBucket(RedisKeyEnum.PRE_LOGIN_BLACK.name() + userId).set("密码错误次数过多，被锁定的账号");
+            redissonClient.<Long, String>getMap(RedisKeyEnum.PRE_LOGIN_BLACK.name()).put(userId, "密码错误次数过多，被锁定的账号");
             atomicLong.delete(); // 清空错误次数
         }
     }
