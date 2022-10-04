@@ -6,7 +6,7 @@ import com.cmcorg.engine.web.model.generate.model.annotation.WebPage;
 import com.cmcorg.engine.web.model.generate.model.enums.PageTypeEnum;
 import com.cmcorg.engine.web.model.model.dto.NotEmptyIdSet;
 import com.cmcorg.engine.web.model.model.dto.NotNullId;
-import com.cmcorg.engine.web.model.model.vo.DictLongListVO;
+import com.cmcorg.engine.web.model.model.vo.DictResultVO;
 import com.cmcorg.service.engine.web.user.model.dto.SysUserDictListDTO;
 import com.cmcorg.service.engine.web.user.model.dto.SysUserInsertOrUpdateDTO;
 import com.cmcorg.service.engine.web.user.model.dto.SysUserPageDTO;
@@ -44,7 +44,7 @@ public class SysUserController {
     @Operation(summary = "下拉列表")
     @PostMapping("/dictList")
     @PreAuthorize("hasAuthority('sysUser:page')")
-    public ApiResultVO<Page<DictLongListVO>> dictList(@RequestBody @Valid SysUserDictListDTO dto) {
+    public ApiResultVO<Page<DictResultVO>> dictList(@RequestBody @Valid SysUserDictListDTO dto) {
         return ApiResultVO.ok(baseService.dictList(dto));
     }
 

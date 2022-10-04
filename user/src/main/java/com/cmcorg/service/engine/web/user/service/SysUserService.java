@@ -5,7 +5,7 @@ import com.baomidou.mybatisplus.extension.service.IService;
 import com.cmcorg.engine.web.auth.model.entity.SysUserDO;
 import com.cmcorg.engine.web.model.model.dto.NotEmptyIdSet;
 import com.cmcorg.engine.web.model.model.dto.NotNullId;
-import com.cmcorg.engine.web.model.model.vo.DictLongListVO;
+import com.cmcorg.engine.web.model.model.vo.DictResultVO;
 import com.cmcorg.service.engine.web.user.model.dto.SysUserDictListDTO;
 import com.cmcorg.service.engine.web.user.model.dto.SysUserInsertOrUpdateDTO;
 import com.cmcorg.service.engine.web.user.model.dto.SysUserPageDTO;
@@ -17,7 +17,7 @@ public interface SysUserService extends IService<SysUserDO> {
 
     Page<SysUserPageVO> myPage(SysUserPageDTO dto);
 
-    Page<DictLongListVO> dictList(SysUserDictListDTO dto);
+    Page<DictResultVO> dictList(SysUserDictListDTO dto);
 
     String insertOrUpdate(SysUserInsertOrUpdateDTO dto);
 

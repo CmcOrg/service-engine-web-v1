@@ -23,7 +23,7 @@ import com.cmcorg.engine.web.model.model.constant.BaseRegexConstant;
 import com.cmcorg.engine.web.model.model.constant.ParamConstant;
 import com.cmcorg.engine.web.model.model.dto.NotEmptyIdSet;
 import com.cmcorg.engine.web.model.model.dto.NotNullId;
-import com.cmcorg.engine.web.model.model.vo.DictLongListVO;
+import com.cmcorg.engine.web.model.model.vo.DictResultVO;
 import com.cmcorg.engine.web.redisson.enums.RedisKeyEnum;
 import com.cmcorg.engine.web.redisson.util.RedissonUtil;
 import com.cmcorg.engine.web.util.util.MyMapUtil;
@@ -103,22 +103,22 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
      * 下拉列表
      */
     @Override
-    public Page<DictLongListVO> dictList(SysUserDictListDTO dto) {
+    public Page<DictResultVO> dictList(SysUserDictListDTO dto) {
 
         List<SysUserInfoDO> sysUserInfoDOList =
             ChainWrappers.lambdaQueryChain(sysUserInfoMapper).select(SysUserInfoDO::getId, SysUserInfoDO::getNickname)
                 .list();
 
-        List<DictLongListVO> dictListVOList =
-            sysUserInfoDOList.stream().map(it -> new DictLongListVO(it.getNickname(), it.getId()))
+        List<DictResultVO> dictListVOList =
+            sysUserInfoDOList.stream().map(it -> new DictResultVO(it.getId(), it.getNickname()))
                 .collect(Collectors.toList());
 
         // 增加 admin账号
         if (BooleanUtil.isTrue(dto.getAddAdminFlag())) {
-            dictListVOList.add(new DictLongListVO(authProperties.getAdminNickname(), BaseConstant.ADMIN_ID));
+            dictListVOList.add(new DictResultVO(BaseConstant.ADMIN_ID, authProperties.getAdminNickname()));
         }
 
-        return new Page<DictLongListVO>().setTotal(sysUserInfoDOList.size()).setRecords(dictListVOList);
+        return new Page<DictResultVO>().setTotal(sysUserInfoDOList.size()).setRecords(dictListVOList);
     }
 
     /**
