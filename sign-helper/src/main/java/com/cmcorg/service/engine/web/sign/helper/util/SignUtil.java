@@ -629,6 +629,9 @@ public class SignUtil {
      */
     public static void doSignDeleteSub(Set<Long> idSet) {
 
+        // 直接：删除用户基本信息
+        ChainWrappers.lambdaUpdateChain(sysUserInfoMapper).in(SysUserInfoDO::getId, idSet).remove();
+
         // 直接：删除用户绑定的角色
         ChainWrappers.lambdaUpdateChain(sysRoleRefUserMapper).in(SysRoleRefUserDO::getUserId, idSet).remove();
 
