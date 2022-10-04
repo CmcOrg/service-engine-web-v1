@@ -27,8 +27,7 @@ public class SignSignInNameServiceImpl implements SignSignInNameService {
     public String signUp(SignSignInNameSignUpDTO dto) {
 
         return SignUtil
-            .signUp(dto.getPassword(), dto.getOrigPassword(), null, RedisKeyEnum.PRE_SIGN_IN_NAME, dto.getSignInName(),
-                true);
+            .signUp(dto.getPassword(), dto.getOrigPassword(), null, RedisKeyEnum.PRE_SIGN_IN_NAME, dto.getSignInName());
     }
 
     /**

@@ -44,8 +44,7 @@ public class SignEmailServiceImpl implements SignEmailService {
     public String signUp(SignEmailSignUpDTO dto) {
 
         return SignUtil
-            .signUp(dto.getPassword(), dto.getOrigPassword(), dto.getCode(), RedisKeyEnum.PRE_EMAIL, dto.getEmail(),
-                true);
+            .signUp(dto.getPassword(), dto.getOrigPassword(), dto.getCode(), RedisKeyEnum.PRE_EMAIL, dto.getEmail());
     }
 
     /**

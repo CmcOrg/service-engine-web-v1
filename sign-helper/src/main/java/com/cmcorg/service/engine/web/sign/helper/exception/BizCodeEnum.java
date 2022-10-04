@@ -11,7 +11,7 @@ public enum BizCodeEnum implements IBizCode {
     EMAIL_HAS_BEEN_REGISTERED(300011, "该邮箱已被注册"), //
     TOO_MANY_LOGIN_FAILURES(300031, "密码错误次数过多，已被冻结，请点击【忘记密码】，进行密码修改"), //
     NO_PASSWORD_SET(300041, "未设置密码，请点击【忘记密码】，进行密码设置"), //
-    ACCOUNT_NUMBER_OR_PASSWORD_NOT_VALID(300051, "账号或密码错误"), //
+    ACCOUNT_OR_PASSWORD_NOT_VALID(300051, "账号或密码错误"), //
     ACCOUNT_IS_DISABLED(300061, "账户被冻结，请联系管理员"), //
     USER_DOES_NOT_EXIST(300071, "操作失败：用户不存在"), //
     PASSWORD_NOT_VALID(300081, "操作失败：当前密码错误"), //

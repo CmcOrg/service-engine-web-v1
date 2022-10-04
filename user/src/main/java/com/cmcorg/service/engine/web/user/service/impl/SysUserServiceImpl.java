@@ -71,6 +71,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
 
         for (SysUserPageVO item : page.getRecords()) {
             item.setEmail(DesensitizedUtil.email(item.getEmail())); // 脱敏
+            item.setSignInName(DesensitizedUtil.chineseName(item.getSignInName())); // 脱敏
             userIdSet.add(item.getId());
         }
 
