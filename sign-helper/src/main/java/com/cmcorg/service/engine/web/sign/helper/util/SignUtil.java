@@ -6,9 +6,11 @@ import cn.hutool.core.util.*;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
 import com.cmcorg.engine.web.auth.exception.BaseBizCodeEnum;
+import com.cmcorg.engine.web.auth.mapper.SysRoleRefUserMapper;
 import com.cmcorg.engine.web.auth.mapper.SysUserInfoMapper;
 import com.cmcorg.engine.web.auth.mapper.SysUserMapper;
 import com.cmcorg.engine.web.auth.model.entity.BaseEntity;
+import com.cmcorg.engine.web.auth.model.entity.SysRoleRefUserDO;
 import com.cmcorg.engine.web.auth.model.entity.SysUserDO;
 import com.cmcorg.engine.web.auth.model.entity.SysUserInfoDO;
 import com.cmcorg.engine.web.auth.model.vo.ApiResultVO;
@@ -44,6 +46,7 @@ public class SignUtil {
 
     private static SysUserInfoMapper sysUserInfoMapper;
     private static SysUserMapper sysUserMapper;
+    private static SysRoleRefUserMapper sysRoleRefUserMapper;
     private static RedissonClient redissonClient;
     private static AuthProperties authProperties;
     private static List<AbstractSignHelperSecurityPermitAllConfiguration>
@@ -107,7 +110,7 @@ public class SignUtil {
     }
 
     /**
-     * 获取账户信息，并发送邮件
+     * 获取账户信息，并执行发送验证码操作
      */
     public static String getAccountAndSendCode(RedisKeyEnum redisKeyEnum,
         SignGetAccountAndSendCodeInterface signGetAccountAndSendCodeInterface) {
@@ -120,6 +123,7 @@ public class SignUtil {
         redissonClient.getBucket(redisKeyEnum + code)
             .set(code, BaseConstant.MINUTE_10_EXPIRE_TIME, TimeUnit.MILLISECONDS);
 
+        // 执行：发送验证码操作
         signGetAccountAndSendCodeInterface.doAfter(code, sysUserDO);
 
         return BaseBizCodeEnum.SEND_OK;
@@ -235,7 +239,7 @@ public class SignUtil {
         if (BaseConstant.ADMIN_ACCOUNT.equals(account)) { // 如果是 admin账户
             if (BooleanUtil.isTrue(authProperties.getAdminEnable())) { // 并且配置文件中允许 admin登录
                 // 判断：密码错误次数过多，是否被冻结
-                checkLoginBlack(BaseConstant.ADMIN_ID);
+                checkTooManyPasswordErrors(BaseConstant.ADMIN_ID);
                 if (!authProperties.getAdminPassword().equals(password)) {
                     passwordErrorHandler(BaseConstant.ADMIN_ID);
                     ApiResultVO.error(BizCodeEnum.ACCOUNT_OR_PASSWORD_NOT_VALID);
@@ -256,7 +260,7 @@ public class SignUtil {
         }
 
         // 判断：密码错误次数过多，是否被冻结
-        checkLoginBlack(sysUserDO.getId());
+        checkTooManyPasswordErrors(sysUserDO.getId());
 
         if (StrUtil.isBlank(sysUserDO.getPassword())) {
             ApiResultVO.error(BizCodeEnum.NO_PASSWORD_SET); // 未设置密码，请点击【忘记密码】，进行密码设置
@@ -279,11 +283,12 @@ public class SignUtil {
     /**
      * 判断：密码错误次数过多，是否被冻结
      */
-    private static void checkLoginBlack(Long id) {
+    private static void checkTooManyPasswordErrors(Long id) {
 
-        String lockMessage = redissonClient.<Long, String>getMap(RedisKeyEnum.PRE_LOGIN_BLACK.name()).get(id);
+        String lockMessage =
+            redissonClient.<Long, String>getMap(RedisKeyEnum.PRE_TOO_MANY_PASSWORD_ERRORS.name()).get(id);
         if (StrUtil.isNotBlank(lockMessage)) {
-            ApiResultVO.error(BizCodeEnum.TOO_MANY_LOGIN_FAILURES);
+            ApiResultVO.error(BizCodeEnum.TOO_MANY_PASSWORD_ERRORS);
         }
     }
 
@@ -292,7 +297,7 @@ public class SignUtil {
      */
     private static void passwordErrorHandler(Long userId) {
 
-        RAtomicLong atomicLong = redissonClient.getAtomicLong(RedisKeyEnum.PRE_LOGIN_ERROR_COUNT.name() + userId);
+        RAtomicLong atomicLong = redissonClient.getAtomicLong(RedisKeyEnum.PRE_PASSWORD_ERROR_COUNT.name() + userId);
 
         long count = atomicLong.incrementAndGet(); // 次数 + 1
 
@@ -301,7 +306,8 @@ public class SignUtil {
         }
         if (count > 10) {
             // 超过十次密码错误，则封禁账号，下次再错误，则才会提示
-            redissonClient.<Long, String>getMap(RedisKeyEnum.PRE_LOGIN_BLACK.name()).put(userId, "密码错误次数过多，被锁定的账号");
+            redissonClient.<Long, String>getMap(RedisKeyEnum.PRE_TOO_MANY_PASSWORD_ERRORS.name())
+                .put(userId, "密码错误次数过多，被锁定的账号");
             atomicLong.delete(); // 清空错误次数
         }
     }
@@ -418,7 +424,8 @@ public class SignUtil {
 
         Long currentUserIdNotAdmin = AuthUserUtil.getCurrentUserIdNotAdmin();
 
-        if (StrUtil.isNotBlank(currentPassword)) {
+        if (RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
+            checkTooManyPasswordErrors(currentUserIdNotAdmin);
             checkCurrentPassword(currentPassword, currentUserIdNotAdmin);
         }
 
@@ -528,9 +535,9 @@ public class SignUtil {
 
             RBatch batch = redissonClient.createBatch();
 
-            // 移除登录黑名单
-            batch.getBucket(RedisKeyEnum.PRE_LOGIN_ERROR_COUNT.name() + sysUserDO.getId()).deleteAsync();
-            batch.getBucket(RedisKeyEnum.PRE_LOGIN_BLACK.name() + sysUserDO.getId()).deleteAsync();
+            // 移除密码错误次数相关
+            batch.getBucket(RedisKeyEnum.PRE_PASSWORD_ERROR_COUNT.name() + sysUserDO.getId()).deleteAsync();
+            batch.getBucket(RedisKeyEnum.PRE_TOO_MANY_PASSWORD_ERRORS.name() + sysUserDO.getId()).deleteAsync();
 
             // 删除：验证码
             batch.getBucket(key).deleteAsync();
@@ -565,6 +572,10 @@ public class SignUtil {
             }
 
             sysUserMapper.deleteById(currentUserIdNotAdmin); // 直接：删除用户
+
+            // 直接：删除用户绑定的角色
+            ChainWrappers.lambdaUpdateChain(sysRoleRefUserMapper).eq(SysRoleRefUserDO::getUserId, currentUserIdNotAdmin)
+                .remove();
 
             if (!RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
                 bucket.delete(); // 删除：验证码

@@ -47,6 +47,9 @@ public class SignSignInNameServiceImpl implements SignSignInNameService {
     @Override
     public String updatePassword(SignSignInNameUpdatePasswordDTO dto) {
 
+        // 如果有更高级的修改密码，则禁用低级的修改密码
+        SignUtil.checkSignLevel(SignSignInNameSecurityPermitAllConfiguration.SIGN_LEVEL);
+
         return SignUtil
             .updatePassword(dto.getNewPassword(), dto.getOrigNewPassword(), RedisKeyEnum.PRE_SIGN_IN_NAME, null,
                 dto.getOldPassword());

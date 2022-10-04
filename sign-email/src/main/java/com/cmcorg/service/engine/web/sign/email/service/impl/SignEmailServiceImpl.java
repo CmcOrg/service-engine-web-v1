@@ -7,6 +7,7 @@ import com.cmcorg.engine.web.email.model.enums.EmailMessageEnum;
 import com.cmcorg.engine.web.email.util.MyEmailUtil;
 import com.cmcorg.engine.web.model.model.dto.NotBlankCodeDTO;
 import com.cmcorg.engine.web.redisson.enums.RedisKeyEnum;
+import com.cmcorg.service.engine.web.sign.email.configuration.SignEmailSecurityPermitAllConfiguration;
 import com.cmcorg.service.engine.web.sign.email.model.dto.*;
 import com.cmcorg.service.engine.web.sign.email.service.SignEmailService;
 import com.cmcorg.service.engine.web.sign.helper.exception.BizCodeEnum;
@@ -135,6 +136,9 @@ public class SignEmailServiceImpl implements SignEmailService {
     @Override
     public String signDeleteSendCode() {
 
+        // 如果有更高级的账号注销-发送验证码，则禁用低级的账号注销-发送验证码
+        SignUtil.checkSignLevel(SignEmailSecurityPermitAllConfiguration.SIGN_LEVEL);
+
         return SignUtil.getAccountAndSendCode(RedisKeyEnum.PRE_EMAIL,
             (code, sysUserDO) -> MyEmailUtil.send(sysUserDO.getEmail(), EmailMessageEnum.SIGN_DELETE, code, false));
     }
@@ -144,6 +148,9 @@ public class SignEmailServiceImpl implements SignEmailService {
      */
     @Override
     public String signDelete(NotBlankCodeDTO dto) {
+
+        // 如果有更高级的账号注销，则禁用低级的账号注销
+        SignUtil.checkSignLevel(SignEmailSecurityPermitAllConfiguration.SIGN_LEVEL);
 
         return SignUtil.signDelete(dto.getCode(), RedisKeyEnum.PRE_EMAIL, null);
     }
