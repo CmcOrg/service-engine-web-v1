@@ -22,7 +22,7 @@ public class SysMenuInsertOrUpdateDTO extends BaseInsertOrUpdateDTO {
     @Schema(description = "菜单名")
     private String name;
 
-    @RequestField(formTitle = "路径", formTooltip = "相同父菜单下，子菜单 path不能重复")
+    @RequestField(formTitle = "路径", formTooltip = "相同父菜单下，子菜单路径不能重复")
     @Schema(description = "页面的 path，备注：相同父菜单下，子菜单 path不能重复")
     private String path;
 
