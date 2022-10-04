@@ -10,6 +10,7 @@ import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
 import com.cmcorg.engine.web.auth.exception.BaseBizCodeEnum;
 import com.cmcorg.engine.web.auth.mapper.SysUserInfoMapper;
 import com.cmcorg.engine.web.auth.mapper.SysUserMapper;
+import com.cmcorg.engine.web.auth.model.entity.BaseEntity;
 import com.cmcorg.engine.web.auth.model.entity.SysRoleRefUserDO;
 import com.cmcorg.engine.web.auth.model.entity.SysUserDO;
 import com.cmcorg.engine.web.auth.model.entity.SysUserInfoDO;
@@ -257,12 +258,24 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
     @Override
     public SysUserInfoByIdVO infoById(NotNullId notNullId) {
 
-        SysUserInfoByIdVO sysUserInfoByIdVO =
-            BeanUtil.copyProperties(getById(notNullId.getId()), SysUserInfoByIdVO.class);
+        SysUserDO sysUserDO = lambdaQuery()
+            .select(SysUserDO::getSignInName, SysUserDO::getEmail, SysUserDO::getEnableFlag, SysUserDO::getPhone,
+                BaseEntity::getId, BaseEntity::getUpdateTime, BaseEntity::getCreateTime)
+            .eq(BaseEntity::getId, notNullId.getId()).one();
+
+        SysUserInfoByIdVO sysUserInfoByIdVO = BeanUtil.copyProperties(sysUserDO, SysUserInfoByIdVO.class);
 
         if (sysUserInfoByIdVO == null) {
             return null;
         }
+
+        SysUserInfoDO sysUserInfoDO =
+            ChainWrappers.lambdaQueryChain(sysUserInfoMapper).eq(SysUserInfoDO::getId, notNullId.getId())
+                .select(SysUserInfoDO::getNickname, SysUserInfoDO::getAvatarUri, SysUserInfoDO::getBio).one();
+
+        sysUserInfoByIdVO.setNickname(sysUserInfoDO.getNickname());
+        sysUserInfoByIdVO.setAvatarUri(sysUserInfoDO.getAvatarUri());
+        sysUserInfoByIdVO.setBio(sysUserInfoDO.getBio());
 
         // 获取：用户绑定的角色 idSet
         List<SysRoleRefUserDO> refUserDOList =
@@ -271,7 +284,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
         Set<Long> roleIdSet = refUserDOList.stream().map(SysRoleRefUserDO::getRoleId).collect(Collectors.toSet());
 
         sysUserInfoByIdVO.setRoleIdSet(roleIdSet);
-        sysUserInfoByIdVO.setPassword(null); // 密码设置为 null
 
         return sysUserInfoByIdVO;
     }
