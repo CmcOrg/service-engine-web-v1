@@ -191,8 +191,8 @@ public class SignUtil {
     /**
      * 新增：用户
      */
-    public static void insertUser(String password, Map<RedisKeyEnum, String> accountMap, boolean checkPasswordBlank,
-        SysUserInfoDO tempSysUserInfoDO, Boolean enableFlag) {
+    public static SysUserDO insertUser(String password, Map<RedisKeyEnum, String> accountMap,
+        boolean checkPasswordBlank, SysUserInfoDO tempSysUserInfoDO, Boolean enableFlag) {
 
         SysUserDO sysUserDO = new SysUserDO();
         if (enableFlag == null) {
@@ -245,6 +245,7 @@ public class SignUtil {
 
         }
 
+        return sysUserDO;
     }
 
     /**

@@ -148,21 +148,21 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
             }
         }
 
-        Set<RedisKeyEnum> hashSet = CollUtil.newHashSet();
+        Set<RedisKeyEnum> redisKeyEnumSet = CollUtil.newHashSet();
 
         if (!emailBlank) {
-            hashSet.add(RedisKeyEnum.PRE_EMAIL);
+            redisKeyEnumSet.add(RedisKeyEnum.PRE_EMAIL);
         }
         if (!signInNameBlank) {
-            hashSet.add(RedisKeyEnum.PRE_SIGN_IN_NAME);
+            redisKeyEnumSet.add(RedisKeyEnum.PRE_SIGN_IN_NAME);
         }
 
-        return RedissonUtil.doMultiLock("", hashSet, () -> {
+        return RedissonUtil.doMultiLock("", redisKeyEnumSet, () -> {
 
             Map<RedisKeyEnum, String> map = MapUtil.newHashMap();
 
             // 检查：账号是否存在
-            for (RedisKeyEnum item : hashSet) {
+            for (RedisKeyEnum item : redisKeyEnumSet) {
                 if (accountIsExist(dto, item, map)) {
                     SignUtil.accountIsExistError();
                 }
@@ -173,7 +173,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
                 sysUserInfoDO.setNickname(dto.getNickname());
                 sysUserInfoDO.setBio(dto.getBio());
                 sysUserInfoDO.setAvatarUri(dto.getAvatarUri());
-                SignUtil.insertUser(dto.getPassword(), map, false, sysUserInfoDO, dto.getEnableFlag());
+                SysUserDO sysUserDO =
+                    SignUtil.insertUser(dto.getPassword(), map, false, sysUserInfoDO, dto.getEnableFlag());
+                insertOrUpdateSub(sysUserDO.getId(), dto); // 新增数据到子表
             } else { // 修改：用户
 
                 // 删除子表数据
