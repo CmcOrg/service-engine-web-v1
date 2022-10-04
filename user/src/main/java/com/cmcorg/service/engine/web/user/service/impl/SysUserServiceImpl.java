@@ -149,9 +149,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
 
         Set<RedisKeyEnum> hashSet = CollUtil.newHashSet();
 
-        if (emailBlank) {
+        if (!emailBlank) {
             hashSet.add(RedisKeyEnum.PRE_EMAIL);
-        } else if (signInNameBlank) {
+        } else {
             hashSet.add(RedisKeyEnum.PRE_SIGN_IN_NAME);
         }
 
