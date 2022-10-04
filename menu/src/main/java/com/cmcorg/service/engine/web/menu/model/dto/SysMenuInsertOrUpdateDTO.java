@@ -60,11 +60,11 @@ public class SysMenuInsertOrUpdateDTO extends BaseInsertOrUpdateDTO {
     @Schema(description = "是否显示在 左侧的菜单栏里面，如果为 false，也可以通过 $router.push()访问到")
     private Boolean showFlag;
 
-    @Schema(description = "备注")
-    private String remark;
-
     @RequestField(tableTitle = "重定向", formTooltip = "优先级最高")
     @Schema(description = "重定向，优先级最高")
     private String redirect;
+
+    @Schema(description = "备注")
+    private String remark;
 
 }

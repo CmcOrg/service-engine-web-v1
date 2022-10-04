@@ -1,6 +1,7 @@
 package com.cmcorg.service.engine.web.user.model.dto;
 
 import com.cmcorg.engine.web.model.generate.model.annotation.RequestField;
+import com.cmcorg.engine.web.model.generate.model.enums.FormInputTypeEnum;
 import com.cmcorg.engine.web.model.model.constant.BaseRegexConstant;
 import com.cmcorg.engine.web.model.model.dto.BaseInsertOrUpdateDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -46,7 +47,7 @@ public class SysUserInsertOrUpdateDTO extends BaseInsertOrUpdateDTO {
     @Schema(description = "正常/冻结")
     private Boolean enableFlag;
 
-    @RequestField(formTitle = "绑定角色")
+    @RequestField(formTitle = "关联角色", formInputType = FormInputTypeEnum.SELECT, formSelectMultipleFlag = true, formSelectRequestStr = "SysRolePage", formSelectOptionsOrRequestImportStr = "import {SysRolePage} from \"@/api/admin/SysRoleController\";\n")
     @Schema(description = "角色 idSet")
     private Set<Long> roleIdSet;
 
