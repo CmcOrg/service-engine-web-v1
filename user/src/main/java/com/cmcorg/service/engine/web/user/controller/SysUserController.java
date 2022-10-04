@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
 import javax.validation.Valid;
-import java.util.List;
 
 @WebPage(type = PageTypeEnum.ADMIN, title = "用户管理")
 @RestController
@@ -45,7 +44,7 @@ public class SysUserController {
     @Operation(summary = "下拉列表")
     @PostMapping("/dictList")
     @PreAuthorize("hasAuthority('sysUser:page')")
-    public ApiResultVO<List<DictLongListVO>> dictList(@RequestBody @Valid SysUserDictListDTO dto) {
+    public ApiResultVO<Page<DictLongListVO>> dictList(@RequestBody @Valid SysUserDictListDTO dto) {
         return ApiResultVO.ok(baseService.dictList(dto));
     }
 

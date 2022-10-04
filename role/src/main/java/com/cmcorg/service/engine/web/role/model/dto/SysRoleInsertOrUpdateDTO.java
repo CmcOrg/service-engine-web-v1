@@ -23,7 +23,7 @@ public class SysRoleInsertOrUpdateDTO extends BaseInsertOrUpdateDTO {
     @Schema(description = "菜单 idSet")
     private Set<Long> menuIdSet;
 
-    @RequestField(tableTitle = "关联用户", formInputType = FormInputTypeEnum.SELECT, formSelectMultipleFlag = true)
+    @RequestField(tableTitle = "关联用户", formInputType = FormInputTypeEnum.SELECT, formSelectMultipleFlag = true, formSelectRequestStr = "SysUserDictList", formSelectOptionsOrRequestImportStr = "import {SysUserDictList} from \"@/api/admin/SysUserController\";\n")
     @Schema(description = "用户 idSet")
     private Set<Long> userIdSet;
 

@@ -13,13 +13,11 @@ import com.cmcorg.service.engine.web.user.model.dto.SysUserUpdatePasswordDTO;
 import com.cmcorg.service.engine.web.user.model.vo.SysUserInfoByIdVO;
 import com.cmcorg.service.engine.web.user.model.vo.SysUserPageVO;
 
-import java.util.List;
-
 public interface SysUserService extends IService<SysUserDO> {
 
     Page<SysUserPageVO> myPage(SysUserPageDTO dto);
 
-    List<DictLongListVO> dictList(SysUserDictListDTO dto);
+    Page<DictLongListVO> dictList(SysUserDictListDTO dto);
 
     String insertOrUpdate(SysUserInsertOrUpdateDTO dto);
 

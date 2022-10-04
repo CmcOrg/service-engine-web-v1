@@ -103,7 +103,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
      * 下拉列表
      */
     @Override
-    public List<DictLongListVO> dictList(SysUserDictListDTO dto) {
+    public Page<DictLongListVO> dictList(SysUserDictListDTO dto) {
 
         List<SysUserInfoDO> sysUserInfoDOList =
             ChainWrappers.lambdaQueryChain(sysUserInfoMapper).select(SysUserInfoDO::getId, SysUserInfoDO::getNickname)
@@ -118,7 +118,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
             dictListVOList.add(new DictLongListVO(authProperties.getAdminNickname(), BaseConstant.ADMIN_ID));
         }
 
-        return dictListVOList;
+        return new Page<DictLongListVO>().setTotal(sysUserInfoDOList.size()).setRecords(dictListVOList);
     }
 
     /**
