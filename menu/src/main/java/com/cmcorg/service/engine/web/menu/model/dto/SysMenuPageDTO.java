@@ -27,7 +27,7 @@ public class SysMenuPageDTO extends MyPageDTO {
     @Schema(description = "是否启用")
     private Boolean enableFlag;
 
-    @Schema(description = "是否外链，即，打开页面会在一个新的窗口打开，可以配合 router")
+    @Schema(description = "是否外链，即，打开页面会在一个新的窗口打开")
     private Boolean linkFlag;
 
     @Schema(description = "路由")
