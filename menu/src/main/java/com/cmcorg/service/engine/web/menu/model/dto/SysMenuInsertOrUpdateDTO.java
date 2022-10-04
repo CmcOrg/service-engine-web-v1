@@ -63,8 +63,8 @@ public class SysMenuInsertOrUpdateDTO extends BaseInsertOrUpdateDTO {
     @Schema(description = "备注")
     private String remark;
 
-    @RequestField(formIgnoreFlag = true)
-    @Schema(description = "重定向，暂时未使用")
+    @RequestField(tableTitle = "重定向", formTooltip = "优先级最高")
+    @Schema(description = "重定向，优先级最高")
     private String redirect;
 
 }

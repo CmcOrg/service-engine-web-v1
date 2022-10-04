@@ -33,7 +33,7 @@ public class SysMenuPageDTO extends MyPageDTO {
     @Schema(description = "路由")
     private String router;
 
-    @Schema(description = "重定向，暂时未使用")
+    @Schema(description = "重定向，优先级最高")
     private String redirect;
 
     @Schema(description = "是否是起始页面，备注：只能存在一个 firstFlag === true 的菜单")
