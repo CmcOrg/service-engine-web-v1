@@ -136,7 +136,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
 
         boolean passwordFlag = StrUtil.isNotBlank(dto.getPassword()) && StrUtil.isNotBlank(dto.getOrigPassword());
 
-        if (dto.getId() == null && passwordFlag) {
+        if (dto.getId() == null && passwordFlag) { // 只有新增时，才可以设置密码
             String paramValue = SysParamUtil.getValueById(ParamConstant.RSA_PRIVATE_KEY_ID); // 获取非对称 私钥
             dto.setOrigPassword(MyRsaUtil.rsaDecrypt(dto.getOrigPassword(), paramValue));
             dto.setPassword(MyRsaUtil.rsaDecrypt(dto.getPassword(), paramValue));

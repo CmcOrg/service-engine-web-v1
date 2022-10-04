@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 import javax.validation.constraints.Size;
 import java.util.Set;
@@ -34,7 +33,6 @@ public class SysUserInsertOrUpdateDTO extends BaseInsertOrUpdateDTO {
     @Schema(description = "前端加密之后的原始密码")
     private String origPassword;
 
-    @NotBlank
     @Pattern(regexp = BaseRegexConstant.NICK_NAME_REGEXP)
     @Schema(description = "昵称")
     private String nickname;
