@@ -59,6 +59,7 @@ public class SignUtil {
     public SignUtil(SysUserInfoMapper sysUserInfoMapper, RedissonClient redissonClient, SysUserMapper sysUserMapper,
         AuthProperties authProperties,
         List<AbstractSignHelperSecurityPermitAllConfiguration> abstractSignHelperSecurityPermitAllConfigurationList,
+        SysRoleRefUserMapper sysRoleRefUserMapper,
         @Autowired(required = false) ISysUserInfoDOHandler iSysUserInfoDOHandler) {
         SignUtil.sysUserInfoMapper = sysUserInfoMapper;
         SignUtil.sysUserMapper = sysUserMapper;
@@ -66,6 +67,7 @@ public class SignUtil {
         SignUtil.authProperties = authProperties;
         SignUtil.abstractSignHelperSecurityPermitAllConfigurationList =
             abstractSignHelperSecurityPermitAllConfigurationList;
+        SignUtil.sysRoleRefUserMapper = sysRoleRefUserMapper;
         SignUtil.iSysUserInfoDOHandler = iSysUserInfoDOHandler;
     }
 
