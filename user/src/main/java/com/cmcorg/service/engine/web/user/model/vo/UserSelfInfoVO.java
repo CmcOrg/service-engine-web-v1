@@ -1,13 +1,13 @@
 package com.cmcorg.service.engine.web.user.model.vo;
 
-import com.cmcorg.service.engine.web.user.model.dto.UserSelfUpdateBaseInfoDTO;
+import com.cmcorg.service.engine.web.user.model.dto.UserSelfUpdateInfoDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @EqualsAndHashCode(callSuper = true)
 @Data
-public class UserSelfBaseInfoVO extends UserSelfUpdateBaseInfoDTO {
+public class UserSelfInfoVO extends UserSelfUpdateInfoDTO {
 
     @Schema(description = "邮箱，会脱敏")
     private String email;

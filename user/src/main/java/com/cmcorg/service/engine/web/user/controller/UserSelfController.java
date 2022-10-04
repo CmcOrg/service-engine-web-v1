@@ -1,8 +1,8 @@
 package com.cmcorg.service.engine.web.user.controller;
 
 import com.cmcorg.engine.web.auth.model.vo.ApiResultVO;
-import com.cmcorg.service.engine.web.user.model.dto.UserSelfUpdateBaseInfoDTO;
-import com.cmcorg.service.engine.web.user.model.vo.UserSelfBaseInfoVO;
+import com.cmcorg.service.engine.web.user.model.dto.UserSelfUpdateInfoDTO;
+import com.cmcorg.service.engine.web.user.model.vo.UserSelfInfoVO;
 import com.cmcorg.service.engine.web.user.service.UserSelfService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,15 +23,15 @@ public class UserSelfController {
     UserSelfService baseService;
 
     @Operation(summary = "获取：当前用户，基本信息")
-    @PostMapping(value = "/baseInfo")
-    public ApiResultVO<UserSelfBaseInfoVO> userSelfBaseInfo() {
-        return ApiResultVO.ok(baseService.userSelfBaseInfo());
+    @PostMapping(value = "/info")
+    public ApiResultVO<UserSelfInfoVO> userSelfInfo() {
+        return ApiResultVO.ok(baseService.userSelfInfo());
     }
 
     @Operation(summary = "当前用户：基本信息：修改")
-    @PostMapping(value = "/updateBaseInfo")
-    public ApiResultVO<String> userSelfUpdateBaseInfo(@RequestBody @Valid UserSelfUpdateBaseInfoDTO dto) {
-        return ApiResultVO.ok(baseService.userSelfUpdateBaseInfo(dto));
+    @PostMapping(value = "/updateInfo")
+    public ApiResultVO<String> userSelfUpdateInfo(@RequestBody @Valid UserSelfUpdateInfoDTO dto) {
+        return ApiResultVO.ok(baseService.userSelfUpdateInfo(dto));
     }
 
     @Operation(summary = "当前用户：刷新jwt私钥后缀")

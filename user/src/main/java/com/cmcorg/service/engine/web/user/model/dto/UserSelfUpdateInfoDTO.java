@@ -8,7 +8,7 @@ import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 @Data
-public class UserSelfUpdateBaseInfoDTO {
+public class UserSelfUpdateInfoDTO {
 
     @Schema(description = "头像uri")
     private String avatarUri;

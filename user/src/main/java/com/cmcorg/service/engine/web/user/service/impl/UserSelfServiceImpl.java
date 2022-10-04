@@ -15,8 +15,8 @@ import com.cmcorg.engine.web.auth.properties.AuthProperties;
 import com.cmcorg.engine.web.auth.util.AuthUserUtil;
 import com.cmcorg.engine.web.auth.util.MyEntityUtil;
 import com.cmcorg.engine.web.model.model.constant.BaseConstant;
-import com.cmcorg.service.engine.web.user.model.dto.UserSelfUpdateBaseInfoDTO;
-import com.cmcorg.service.engine.web.user.model.vo.UserSelfBaseInfoVO;
+import com.cmcorg.service.engine.web.user.model.dto.UserSelfUpdateInfoDTO;
+import com.cmcorg.service.engine.web.user.model.vo.UserSelfInfoVO;
 import com.cmcorg.service.engine.web.user.service.UserSelfService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,19 +35,19 @@ public class UserSelfServiceImpl extends ServiceImpl<SysUserMapper, SysUserDO> i
      * 获取：当前用户，基本信息
      */
     @Override
-    public UserSelfBaseInfoVO userSelfBaseInfo() {
+    public UserSelfInfoVO userSelfInfo() {
 
         Long currentUserId = AuthUserUtil.getCurrentUserId();
 
-        UserSelfBaseInfoVO sysUserSelfBaseInfoVO = new UserSelfBaseInfoVO();
+        UserSelfInfoVO sysUserSelfInfoVO = new UserSelfInfoVO();
 
         if (BaseConstant.ADMIN_ID.equals(currentUserId)) {
-            sysUserSelfBaseInfoVO.setAvatarUri("");
-            sysUserSelfBaseInfoVO.setNickname(authProperties.getAdminNickname());
-            sysUserSelfBaseInfoVO.setBio("");
-            sysUserSelfBaseInfoVO.setEmail("");
-            sysUserSelfBaseInfoVO.setPasswordFlag(true);
-            return sysUserSelfBaseInfoVO;
+            sysUserSelfInfoVO.setAvatarUri("");
+            sysUserSelfInfoVO.setNickname(authProperties.getAdminNickname());
+            sysUserSelfInfoVO.setBio("");
+            sysUserSelfInfoVO.setEmail("");
+            sysUserSelfInfoVO.setPasswordFlag(true);
+            return sysUserSelfInfoVO;
         }
 
         SysUserInfoDO sysUserInfoDO =
@@ -58,15 +58,15 @@ public class UserSelfServiceImpl extends ServiceImpl<SysUserMapper, SysUserDO> i
             .select(SysUserDO::getEmail, SysUserDO::getPassword, SysUserDO::getSignInName).one();
 
         if (sysUserInfoDO != null && sysUserDO != null) {
-            sysUserSelfBaseInfoVO.setAvatarUri(sysUserInfoDO.getAvatarUri());
-            sysUserSelfBaseInfoVO.setNickname(sysUserInfoDO.getNickname());
-            sysUserSelfBaseInfoVO.setBio(sysUserInfoDO.getBio());
-            sysUserSelfBaseInfoVO.setEmail(DesensitizedUtil.email(sysUserDO.getEmail())); // 脱敏
-            sysUserSelfBaseInfoVO.setSignInName(DesensitizedUtil.chineseName(sysUserDO.getSignInName())); // 脱敏
-            sysUserSelfBaseInfoVO.setPasswordFlag(StrUtil.isNotBlank(sysUserDO.getPassword()));
+            sysUserSelfInfoVO.setAvatarUri(sysUserInfoDO.getAvatarUri());
+            sysUserSelfInfoVO.setNickname(sysUserInfoDO.getNickname());
+            sysUserSelfInfoVO.setBio(sysUserInfoDO.getBio());
+            sysUserSelfInfoVO.setEmail(DesensitizedUtil.email(sysUserDO.getEmail())); // 脱敏
+            sysUserSelfInfoVO.setSignInName(DesensitizedUtil.chineseName(sysUserDO.getSignInName())); // 脱敏
+            sysUserSelfInfoVO.setPasswordFlag(StrUtil.isNotBlank(sysUserDO.getPassword()));
         }
 
-        return sysUserSelfBaseInfoVO;
+        return sysUserSelfInfoVO;
     }
 
     /**
@@ -74,7 +74,7 @@ public class UserSelfServiceImpl extends ServiceImpl<SysUserMapper, SysUserDO> i
      */
     @Override
     @Transactional
-    public String userSelfUpdateBaseInfo(UserSelfUpdateBaseInfoDTO dto) {
+    public String userSelfUpdateInfo(UserSelfUpdateInfoDTO dto) {
 
         Long currentUserIdNotAdmin = AuthUserUtil.getCurrentUserIdNotAdmin();
 

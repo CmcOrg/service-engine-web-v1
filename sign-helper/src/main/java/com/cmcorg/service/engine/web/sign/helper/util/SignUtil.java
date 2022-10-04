@@ -185,7 +185,7 @@ public class SignUtil {
      * 新增：用户
      */
     public static void insertUser(String password, Map<RedisKeyEnum, String> accountMap, boolean checkPasswordBlank,
-        SysUserInfoDO sysUserInfoDOTemp, Boolean enableFlag) {
+        SysUserInfoDO tempSysUserInfoDO, Boolean enableFlag) {
 
         SysUserDO sysUserDO = new SysUserDO();
         if (enableFlag == null) {
@@ -216,14 +216,14 @@ public class SignUtil {
         sysUserInfoDO.setId(sysUserDO.getId());
         sysUserInfoDO.setUuid(IdUtil.simpleUUID());
 
-        if (sysUserInfoDOTemp == null) {
+        if (tempSysUserInfoDO == null) {
             sysUserInfoDO.setNickname(getRandomNickname());
             sysUserInfoDO.setBio("");
             sysUserInfoDO.setAvatarUri("");
         } else {
-            sysUserInfoDO.setNickname(MyEntityUtil.getNotNullStr(sysUserInfoDOTemp.getNickname(), getRandomNickname()));
-            sysUserInfoDO.setBio(MyEntityUtil.getNotNullStr(sysUserInfoDOTemp.getBio()));
-            sysUserInfoDO.setAvatarUri(MyEntityUtil.getNotNullStr(sysUserInfoDOTemp.getAvatarUri()));
+            sysUserInfoDO.setNickname(MyEntityUtil.getNotNullStr(tempSysUserInfoDO.getNickname(), getRandomNickname()));
+            sysUserInfoDO.setBio(MyEntityUtil.getNotNullStr(tempSysUserInfoDO.getBio()));
+            sysUserInfoDO.setAvatarUri(MyEntityUtil.getNotNullStr(tempSysUserInfoDO.getAvatarUri()));
         }
 
         sysUserInfoMapper.insert(sysUserInfoDO); // 保存：用户基本信息
