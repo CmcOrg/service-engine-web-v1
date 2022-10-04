@@ -167,7 +167,7 @@ public class SignUtil {
             }
 
             // 检查：注册的登录账号是否存在
-            boolean exist = accountIsExist(redisKeyEnum, account);
+            boolean exist = accountIsExist(redisKeyEnum, account, null);
             if (exist) {
                 if (!RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
                     bucket.delete(); // 删除：验证码
@@ -466,7 +466,7 @@ public class SignUtil {
             }
 
             // 检查：新的登录账号是否存在
-            boolean exist = accountIsExist(redisKeyEnum, newAccount);
+            boolean exist = accountIsExist(redisKeyEnum, newAccount, currentUserIdNotAdmin);
             if (exist) {
                 newBucket.delete();
                 ApiResultVO.error("操作失败：已被其他人绑定，请重试");
@@ -475,13 +475,8 @@ public class SignUtil {
             SysUserDO sysUserDO = new SysUserDO();
             sysUserDO.setId(currentUserIdNotAdmin);
 
-            if (RedisKeyEnum.PRE_EMAIL.equals(redisKeyEnum)) {
-                sysUserDO.setEmail(newAccount);
-            } else if (RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
-                sysUserDO.setSignInName(newAccount);
-            } else {
-                ApiResultVO.sysError();
-            }
+            // 通过：RedisKeyEnum，设置：账号
+            setSysUserDOAccountByRedisKeyEnum(redisKeyEnum, newAccount, sysUserDO);
 
             sysUserDO.setJwtSecretSuf(IdUtil.simpleUUID());
             sysUserMapper.updateById(sysUserDO); // 更新：用户
@@ -497,11 +492,27 @@ public class SignUtil {
     }
 
     /**
+     * 通过：RedisKeyEnum，设置：账号
+     */
+    private static void setSysUserDOAccountByRedisKeyEnum(RedisKeyEnum redisKeyEnum, String newAccount,
+        SysUserDO sysUserDO) {
+
+        if (RedisKeyEnum.PRE_EMAIL.equals(redisKeyEnum)) {
+            sysUserDO.setEmail(newAccount);
+        } else if (RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
+            sysUserDO.setSignInName(newAccount);
+        } else {
+            ApiResultVO.sysError();
+        }
+    }
+
+    /**
      * 检查登录账号是否存在
      */
-    public static boolean accountIsExist(RedisKeyEnum redisKeyEnum, String newAccount) {
+    public static boolean accountIsExist(RedisKeyEnum redisKeyEnum, String newAccount, Long id) {
 
-        LambdaQueryChainWrapper<SysUserDO> lambdaQueryChainWrapper = ChainWrappers.lambdaQueryChain(sysUserMapper);
+        LambdaQueryChainWrapper<SysUserDO> lambdaQueryChainWrapper =
+            ChainWrappers.lambdaQueryChain(sysUserMapper).ne(id != null, BaseEntity::getId, id);
 
         if (RedisKeyEnum.PRE_EMAIL.equals(redisKeyEnum)) {
             lambdaQueryChainWrapper.eq(SysUserDO::getEmail, newAccount);
@@ -636,7 +647,7 @@ public class SignUtil {
             RBucket<String> bucket = redissonClient.getBucket(key);
 
             // 检查：绑定的登录账号是否存在
-            boolean exist = accountIsExist(redisKeyEnum, account);
+            boolean exist = accountIsExist(redisKeyEnum, account, null);
             if (exist) {
                 bucket.delete();
                 ApiResultVO.error("操作失败：账号已被绑定，请重试");
@@ -645,8 +656,13 @@ public class SignUtil {
             CodeUtil.checkCode(code, bucket.get()); // 检查 code是否正确
 
             SysUserDO sysUserDO = new SysUserDO();
+
+            // 通过：RedisKeyEnum，设置：账号
+            setSysUserDOAccountByRedisKeyEnum(redisKeyEnum, account, sysUserDO);
+
             sysUserDO.setId(currentUserIdNotAdmin);
             sysUserDO.setJwtSecretSuf(IdUtil.simpleUUID());
+
             sysUserMapper.updateById(sysUserDO); // 保存：用户
 
             bucket.delete(); // 删除：验证码

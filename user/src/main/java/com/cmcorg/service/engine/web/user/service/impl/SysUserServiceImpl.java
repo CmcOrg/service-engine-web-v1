@@ -152,7 +152,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
 
         if (!emailBlank) {
             hashSet.add(RedisKeyEnum.PRE_EMAIL);
-        } else {
+        }
+        if (!signInNameBlank) {
             hashSet.add(RedisKeyEnum.PRE_SIGN_IN_NAME);
         }
 
@@ -209,16 +210,18 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
         });
     }
 
+    /**
+     * 判断：账号是否重复
+     */
     private boolean accountIsExist(SysUserInsertOrUpdateDTO dto, RedisKeyEnum item, Map<RedisKeyEnum, String> map) {
         boolean exist = false;
         if (RedisKeyEnum.PRE_EMAIL.equals(item)) {
-            exist = SignUtil.accountIsExist(RedisKeyEnum.PRE_EMAIL, dto.getEmail());
+            exist = SignUtil.accountIsExist(RedisKeyEnum.PRE_EMAIL, dto.getEmail(), dto.getId();
             map.put(item, dto.getEmail());
         } else if (RedisKeyEnum.PRE_SIGN_IN_NAME.equals(item)) {
-            exist = SignUtil.accountIsExist(RedisKeyEnum.PRE_SIGN_IN_NAME, dto.getSignInName());
+            exist = SignUtil.accountIsExist(RedisKeyEnum.PRE_SIGN_IN_NAME, dto.getSignInName(), dto.getId();
             map.put(item, dto.getSignInName());
-        }
-        return exist;
+        } return exist;
     }
 
     /**
