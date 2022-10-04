@@ -38,6 +38,7 @@ import org.springframework.stereotype.Component;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -571,11 +572,8 @@ public class SignUtil {
                 CodeUtil.checkCode(code, bucket.get()); // 检查 code是否正确
             }
 
-            sysUserMapper.deleteById(currentUserIdNotAdmin); // 直接：删除用户
-
-            // 直接：删除用户绑定的角色
-            ChainWrappers.lambdaUpdateChain(sysRoleRefUserMapper).eq(SysRoleRefUserDO::getUserId, currentUserIdNotAdmin)
-                .remove();
+            // 执行：账号注销
+            doSignDelete(CollUtil.newHashSet(currentUserIdNotAdmin));
 
             if (!RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
                 bucket.delete(); // 删除：验证码
@@ -583,6 +581,27 @@ public class SignUtil {
 
             return BaseBizCodeEnum.OK;
         });
+    }
+
+    /**
+     * 执行：账号注销
+     */
+    public static void doSignDelete(Set<Long> idSet) {
+
+        sysUserMapper.deleteBatchIds(idSet); // 直接：删除用户
+
+        doSignDeleteSub(idSet); // 删除子表数据
+
+    }
+
+    /**
+     * 执行：账号注销，删除子表数据
+     */
+    public static void doSignDeleteSub(Set<Long> idSet) {
+
+        // 直接：删除用户绑定的角色
+        ChainWrappers.lambdaUpdateChain(sysRoleRefUserMapper).in(SysRoleRefUserDO::getUserId, idSet).remove();
+
     }
 
     /**

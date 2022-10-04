@@ -10,7 +10,6 @@ import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
 import com.cmcorg.engine.web.auth.exception.BaseBizCodeEnum;
 import com.cmcorg.engine.web.auth.mapper.SysUserInfoMapper;
 import com.cmcorg.engine.web.auth.mapper.SysUserMapper;
-import com.cmcorg.engine.web.auth.model.entity.BaseEntity;
 import com.cmcorg.engine.web.auth.model.entity.SysRoleRefUserDO;
 import com.cmcorg.engine.web.auth.model.entity.SysUserDO;
 import com.cmcorg.engine.web.auth.model.entity.SysUserInfoDO;
@@ -168,7 +167,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
             } else { // 修改：用户
 
                 // 删除子表数据
-                deleteByIdSetSub(CollUtil.newHashSet(dto.getId()));
+                SignUtil.doSignDeleteSub(CollUtil.newHashSet(dto.getId()));
+
                 // 新增数据到子表
                 insertOrUpdateSub(dto.getId(), dto);
 
@@ -204,16 +204,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
     }
 
     /**
-     * 删除子表数据
-     */
-    private void deleteByIdSetSub(Set<Long> idSet) {
-
-        // 删除：角色用户关联表数据
-        sysRoleRefUserService.lambdaUpdate().in(SysRoleRefUserDO::getUserId, idSet).remove();
-
-    }
-
-    /**
      * 新增/修改：新增数据到子表
      */
     private void insertOrUpdateSub(Long userId, SysUserInsertOrUpdateDTO dto) {
@@ -239,10 +229,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
     @Transactional
     public String deleteByIdSet(NotEmptyIdSet notEmptyIdSet) {
 
-        deleteByIdSetSub(notEmptyIdSet.getIdSet()); // 删除关联表数据
-
-        // 直接删除
-        lambdaUpdate().in(BaseEntity::getId, notEmptyIdSet.getIdSet()).remove();
+        SignUtil.doSignDelete(notEmptyIdSet.getIdSet());
 
         return BaseBizCodeEnum.OK;
     }
