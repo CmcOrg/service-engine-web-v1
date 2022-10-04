@@ -40,6 +40,7 @@ import com.cmcorg.service.engine.web.user.model.dto.SysUserUpdatePasswordDTO;
 import com.cmcorg.service.engine.web.user.model.vo.SysUserInfoByIdVO;
 import com.cmcorg.service.engine.web.user.model.vo.SysUserPageVO;
 import com.cmcorg.service.engine.web.user.service.SysUserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -61,7 +62,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
 
     final ISysUserInfoDOHandler iSysUserInfoDOHandler;
 
-    public SysUserServiceImpl(ISysUserInfoDOHandler iSysUserInfoDOHandler) {
+    public SysUserServiceImpl(@Autowired(required = false) ISysUserInfoDOHandler iSysUserInfoDOHandler) {
         this.iSysUserInfoDOHandler = iSysUserInfoDOHandler;
     }
 

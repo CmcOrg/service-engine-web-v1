@@ -34,6 +34,7 @@ import org.redisson.api.RAtomicLong;
 import org.redisson.api.RBatch;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -58,7 +59,7 @@ public class SignUtil {
     public SignUtil(SysUserInfoMapper sysUserInfoMapper, RedissonClient redissonClient, SysUserMapper sysUserMapper,
         AuthProperties authProperties,
         List<AbstractSignHelperSecurityPermitAllConfiguration> abstractSignHelperSecurityPermitAllConfigurationList,
-        ISysUserInfoDOHandler iSysUserInfoDOHandler) {
+        @Autowired(required = false) ISysUserInfoDOHandler iSysUserInfoDOHandler) {
         SignUtil.sysUserInfoMapper = sysUserInfoMapper;
         SignUtil.sysUserMapper = sysUserMapper;
         SignUtil.redissonClient = redissonClient;

@@ -19,6 +19,7 @@ import com.cmcorg.service.engine.web.sign.helper.configuration.ISysUserInfoDOHan
 import com.cmcorg.service.engine.web.sign.helper.model.dto.UserSelfUpdateInfoDTO;
 import com.cmcorg.service.engine.web.user.model.vo.UserSelfInfoVO;
 import com.cmcorg.service.engine.web.user.service.UserSelfService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +35,7 @@ public class UserSelfServiceImpl extends ServiceImpl<SysUserMapper, SysUserDO> i
 
     final ISysUserInfoDOHandler iSysUserInfoDOHandler;
 
-    public UserSelfServiceImpl(ISysUserInfoDOHandler iSysUserInfoDOHandler) {
+    public UserSelfServiceImpl(@Autowired(required = false) ISysUserInfoDOHandler iSysUserInfoDOHandler) {
         this.iSysUserInfoDOHandler = iSysUserInfoDOHandler;
     }
 
