@@ -1,6 +1,5 @@
 package com.cmcorg.service.engine.web.user.service.impl;
 
-import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.DesensitizedUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
@@ -24,7 +23,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 @Service
 public class UserSelfServiceImpl extends ServiceImpl<SysUserMapper, SysUserDO> implements UserSelfService {
@@ -33,8 +31,12 @@ public class UserSelfServiceImpl extends ServiceImpl<SysUserMapper, SysUserDO> i
     AuthProperties authProperties;
     @Resource
     SysUserInfoMapper sysUserInfoMapper;
-    @Resource
-    List<ISysUserInfoDOHandler> iSysUserInfoDOHandlerList;
+
+    final ISysUserInfoDOHandler iSysUserInfoDOHandler;
+
+    public UserSelfServiceImpl(ISysUserInfoDOHandler iSysUserInfoDOHandler) {
+        this.iSysUserInfoDOHandler = iSysUserInfoDOHandler;
+    }
 
     /**
      * 获取：当前用户，基本信息
@@ -82,10 +84,8 @@ public class UserSelfServiceImpl extends ServiceImpl<SysUserMapper, SysUserDO> i
     public String userSelfUpdateInfo(UserSelfUpdateInfoDTO dto) {
 
         // 可以被覆盖
-        if (CollUtil.isNotEmpty(iSysUserInfoDOHandlerList)) {
-            for (ISysUserInfoDOHandler item : iSysUserInfoDOHandlerList) {
-                item.userSelfUpdateInfo(dto);
-            }
+        if (iSysUserInfoDOHandler != null) {
+            iSysUserInfoDOHandler.userSelfUpdateInfo(dto);
         } else {
 
             Long currentUserIdNotAdmin = AuthUserUtil.getCurrentUserIdNotAdmin();

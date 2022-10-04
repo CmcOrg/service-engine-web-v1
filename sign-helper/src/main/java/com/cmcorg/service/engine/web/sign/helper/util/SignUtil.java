@@ -53,19 +53,19 @@ public class SignUtil {
     private static AuthProperties authProperties;
     private static List<AbstractSignHelperSecurityPermitAllConfiguration>
         abstractSignHelperSecurityPermitAllConfigurationList;
-    private static List<ISysUserInfoDOHandler> iSysUserInfoDOHandlerList;
+    private static ISysUserInfoDOHandler iSysUserInfoDOHandler;
 
     public SignUtil(SysUserInfoMapper sysUserInfoMapper, RedissonClient redissonClient, SysUserMapper sysUserMapper,
         AuthProperties authProperties,
         List<AbstractSignHelperSecurityPermitAllConfiguration> abstractSignHelperSecurityPermitAllConfigurationList,
-        List<ISysUserInfoDOHandler> iSysUserInfoDOHandlerList) {
+        ISysUserInfoDOHandler iSysUserInfoDOHandler) {
         SignUtil.sysUserInfoMapper = sysUserInfoMapper;
         SignUtil.sysUserMapper = sysUserMapper;
         SignUtil.redissonClient = redissonClient;
         SignUtil.authProperties = authProperties;
         SignUtil.abstractSignHelperSecurityPermitAllConfigurationList =
             abstractSignHelperSecurityPermitAllConfigurationList;
-        SignUtil.iSysUserInfoDOHandlerList = iSysUserInfoDOHandlerList;
+        SignUtil.iSysUserInfoDOHandler = iSysUserInfoDOHandler;
     }
 
     public interface SignSendCodeInterface {
@@ -217,11 +217,10 @@ public class SignUtil {
         sysUserMapper.insert(sysUserDO); // 保存：用户
 
         // 可以被覆盖
-        if (CollUtil.isNotEmpty(iSysUserInfoDOHandlerList)) {
-            for (ISysUserInfoDOHandler item : iSysUserInfoDOHandlerList) {
-                item.insertUserInfo(sysUserDO.getId(), tempSysUserInfoDO.getNickname(), tempSysUserInfoDO.getBio(),
+        if (iSysUserInfoDOHandler != null) {
+            iSysUserInfoDOHandler
+                .insertUserInfo(sysUserDO.getId(), tempSysUserInfoDO.getNickname(), tempSysUserInfoDO.getBio(),
                     tempSysUserInfoDO.getAvatarUri());
-            }
         } else {
 
             SysUserInfoDO sysUserInfoDO = new SysUserInfoDO();

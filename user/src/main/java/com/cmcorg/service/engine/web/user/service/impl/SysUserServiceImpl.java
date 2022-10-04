@@ -58,8 +58,12 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
     AuthProperties authProperties;
     @Resource
     SysUserMapper sysUserMapper;
-    @Resource
-    List<ISysUserInfoDOHandler> iSysUserInfoDOHandlerList;
+
+    final ISysUserInfoDOHandler iSysUserInfoDOHandler;
+
+    public SysUserServiceImpl(ISysUserInfoDOHandler iSysUserInfoDOHandler) {
+        this.iSysUserInfoDOHandler = iSysUserInfoDOHandler;
+    }
 
     /**
      * 分页排序查询
@@ -183,10 +187,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
                 sysUserMapper.updateById(sysUserDO);
 
                 // 可以被覆盖
-                if (CollUtil.isNotEmpty(iSysUserInfoDOHandlerList)) {
-                    for (ISysUserInfoDOHandler item : iSysUserInfoDOHandlerList) {
-                        item.updateUserInfo(dto.getId(), dto.getNickname(), dto.getBio(), dto.getAvatarUri());
-                    }
+                if (iSysUserInfoDOHandler != null) {
+                    iSysUserInfoDOHandler
+                        .updateUserInfo(dto.getId(), dto.getNickname(), dto.getBio(), dto.getAvatarUri());
                 } else {
 
                     SysUserInfoDO sysUserInfoDO = new SysUserInfoDO();
