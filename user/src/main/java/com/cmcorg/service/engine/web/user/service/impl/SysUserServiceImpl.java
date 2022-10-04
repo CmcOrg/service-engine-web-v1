@@ -29,6 +29,7 @@ import com.cmcorg.engine.web.util.util.MyMapUtil;
 import com.cmcorg.service.engine.web.param.util.MyRsaUtil;
 import com.cmcorg.service.engine.web.param.util.SysParamUtil;
 import com.cmcorg.service.engine.web.role.service.SysRoleRefUserService;
+import com.cmcorg.service.engine.web.sign.helper.configuration.ISysUserInfoDOHandler;
 import com.cmcorg.service.engine.web.sign.helper.util.SignUtil;
 import com.cmcorg.service.engine.web.user.exception.BizCodeEnum;
 import com.cmcorg.service.engine.web.user.mapper.SysUserProMapper;
@@ -57,6 +58,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
     AuthProperties authProperties;
     @Resource
     SysUserMapper sysUserMapper;
+    @Resource
+    List<ISysUserInfoDOHandler> iSysUserInfoDOHandlerList;
 
     /**
      * 分页排序查询
@@ -179,12 +182,22 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
                 sysUserDO.setSignInName(MyEntityUtil.getNotNullStr(dto.getSignInName()));
                 sysUserMapper.updateById(sysUserDO);
 
-                SysUserInfoDO sysUserInfoDO = new SysUserInfoDO();
-                sysUserInfoDO.setId(dto.getId());
-                sysUserInfoDO.setNickname(MyEntityUtil.getNotNullStr(dto.getNickname(), SignUtil.getRandomNickname()));
-                sysUserInfoDO.setBio(MyEntityUtil.getNotNullStr(dto.getBio()));
-                sysUserInfoDO.setAvatarUri(MyEntityUtil.getNotNullStr(dto.getAvatarUri()));
-                sysUserInfoMapper.updateById(sysUserInfoDO);
+                // 可以被覆盖
+                if (CollUtil.isNotEmpty(iSysUserInfoDOHandlerList)) {
+                    for (ISysUserInfoDOHandler item : iSysUserInfoDOHandlerList) {
+                        item.updateUserInfo(dto.getId(), dto.getNickname(), dto.getBio(), dto.getAvatarUri());
+                    }
+                } else {
+
+                    SysUserInfoDO sysUserInfoDO = new SysUserInfoDO();
+                    sysUserInfoDO.setId(dto.getId());
+                    sysUserInfoDO
+                        .setNickname(MyEntityUtil.getNotNullStr(dto.getNickname(), SignUtil.getRandomNickname()));
+                    sysUserInfoDO.setBio(MyEntityUtil.getNotNullStr(dto.getBio()));
+                    sysUserInfoDO.setAvatarUri(MyEntityUtil.getNotNullStr(dto.getAvatarUri()));
+                    sysUserInfoMapper.updateById(sysUserInfoDO);
+
+                }
             }
 
             return BaseBizCodeEnum.OK;

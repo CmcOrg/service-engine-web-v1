@@ -1,6 +1,6 @@
 package com.cmcorg.service.engine.web.user.model.vo;
 
-import com.cmcorg.service.engine.web.user.model.dto.UserSelfUpdateInfoDTO;
+import com.cmcorg.service.engine.web.sign.helper.model.dto.UserSelfUpdateInfoDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;

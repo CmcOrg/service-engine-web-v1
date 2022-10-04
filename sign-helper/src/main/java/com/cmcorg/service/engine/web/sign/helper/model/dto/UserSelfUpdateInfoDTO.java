@@ -1,4 +1,4 @@
-package com.cmcorg.service.engine.web.user.model.dto;
+package com.cmcorg.service.engine.web.sign.helper.model.dto;
 
 import com.cmcorg.engine.web.model.model.constant.BaseRegexConstant;
 import io.swagger.v3.oas.annotations.media.Schema;

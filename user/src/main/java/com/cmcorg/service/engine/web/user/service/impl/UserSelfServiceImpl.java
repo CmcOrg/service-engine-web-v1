@@ -1,5 +1,6 @@
 package com.cmcorg.service.engine.web.user.service.impl;
 
+import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.util.DesensitizedUtil;
 import cn.hutool.core.util.IdUtil;
 import cn.hutool.core.util.StrUtil;
@@ -15,13 +16,15 @@ import com.cmcorg.engine.web.auth.properties.AuthProperties;
 import com.cmcorg.engine.web.auth.util.AuthUserUtil;
 import com.cmcorg.engine.web.auth.util.MyEntityUtil;
 import com.cmcorg.engine.web.model.model.constant.BaseConstant;
-import com.cmcorg.service.engine.web.user.model.dto.UserSelfUpdateInfoDTO;
+import com.cmcorg.service.engine.web.sign.helper.configuration.ISysUserInfoDOHandler;
+import com.cmcorg.service.engine.web.sign.helper.model.dto.UserSelfUpdateInfoDTO;
 import com.cmcorg.service.engine.web.user.model.vo.UserSelfInfoVO;
 import com.cmcorg.service.engine.web.user.service.UserSelfService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import java.util.List;
 
 @Service
 public class UserSelfServiceImpl extends ServiceImpl<SysUserMapper, SysUserDO> implements UserSelfService {
@@ -30,6 +33,8 @@ public class UserSelfServiceImpl extends ServiceImpl<SysUserMapper, SysUserDO> i
     AuthProperties authProperties;
     @Resource
     SysUserInfoMapper sysUserInfoMapper;
+    @Resource
+    List<ISysUserInfoDOHandler> iSysUserInfoDOHandlerList;
 
     /**
      * 获取：当前用户，基本信息
@@ -76,15 +81,24 @@ public class UserSelfServiceImpl extends ServiceImpl<SysUserMapper, SysUserDO> i
     @Transactional
     public String userSelfUpdateInfo(UserSelfUpdateInfoDTO dto) {
 
-        Long currentUserIdNotAdmin = AuthUserUtil.getCurrentUserIdNotAdmin();
+        // 可以被覆盖
+        if (CollUtil.isNotEmpty(iSysUserInfoDOHandlerList)) {
+            for (ISysUserInfoDOHandler item : iSysUserInfoDOHandlerList) {
+                item.userSelfUpdateInfo(dto);
+            }
+        } else {
 
-        SysUserInfoDO sysUserInfoDO = new SysUserInfoDO();
-        sysUserInfoDO.setId(currentUserIdNotAdmin);
-        sysUserInfoDO.setNickname(dto.getNickname());
-        sysUserInfoDO.setBio(MyEntityUtil.getNotNullStr(dto.getBio()));
-        sysUserInfoDO.setAvatarUri(MyEntityUtil.getNotNullStr(dto.getAvatarUri()));
+            Long currentUserIdNotAdmin = AuthUserUtil.getCurrentUserIdNotAdmin();
 
-        sysUserInfoMapper.updateById(sysUserInfoDO);
+            SysUserInfoDO sysUserInfoDO = new SysUserInfoDO();
+            sysUserInfoDO.setId(currentUserIdNotAdmin);
+            sysUserInfoDO.setNickname(dto.getNickname());
+            sysUserInfoDO.setBio(MyEntityUtil.getNotNullStr(dto.getBio()));
+            sysUserInfoDO.setAvatarUri(MyEntityUtil.getNotNullStr(dto.getAvatarUri()));
+
+            sysUserInfoMapper.updateById(sysUserInfoDO);
+
+        }
 
         return BaseBizCodeEnum.OK;
     }

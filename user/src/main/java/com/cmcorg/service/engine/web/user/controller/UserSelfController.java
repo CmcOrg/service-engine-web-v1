@@ -3,7 +3,7 @@ package com.cmcorg.service.engine.web.user.controller;
 import com.cmcorg.engine.web.auth.model.vo.ApiResultVO;
 import com.cmcorg.engine.web.model.generate.model.annotation.WebPage;
 import com.cmcorg.engine.web.model.generate.model.enums.PageTypeEnum;
-import com.cmcorg.service.engine.web.user.model.dto.UserSelfUpdateInfoDTO;
+import com.cmcorg.service.engine.web.sign.helper.model.dto.UserSelfUpdateInfoDTO;
 import com.cmcorg.service.engine.web.user.model.vo.UserSelfInfoVO;
 import com.cmcorg.service.engine.web.user.service.UserSelfService;
 import io.swagger.v3.oas.annotations.Operation;

@@ -26,6 +26,7 @@ import com.cmcorg.engine.web.redisson.util.RedissonUtil;
 import com.cmcorg.service.engine.web.param.util.MyRsaUtil;
 import com.cmcorg.service.engine.web.param.util.SysParamUtil;
 import com.cmcorg.service.engine.web.sign.helper.configuration.AbstractSignHelperSecurityPermitAllConfiguration;
+import com.cmcorg.service.engine.web.sign.helper.configuration.ISysUserInfoDOHandler;
 import com.cmcorg.service.engine.web.sign.helper.exception.BizCodeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -52,16 +53,19 @@ public class SignUtil {
     private static AuthProperties authProperties;
     private static List<AbstractSignHelperSecurityPermitAllConfiguration>
         abstractSignHelperSecurityPermitAllConfigurationList;
+    private static List<ISysUserInfoDOHandler> iSysUserInfoDOHandlerList;
 
     public SignUtil(SysUserInfoMapper sysUserInfoMapper, RedissonClient redissonClient, SysUserMapper sysUserMapper,
         AuthProperties authProperties,
-        List<AbstractSignHelperSecurityPermitAllConfiguration> abstractSignHelperSecurityPermitAllConfigurationList) {
+        List<AbstractSignHelperSecurityPermitAllConfiguration> abstractSignHelperSecurityPermitAllConfigurationList,
+        List<ISysUserInfoDOHandler> iSysUserInfoDOHandlerList) {
         SignUtil.sysUserInfoMapper = sysUserInfoMapper;
         SignUtil.sysUserMapper = sysUserMapper;
         SignUtil.redissonClient = redissonClient;
         SignUtil.authProperties = authProperties;
         SignUtil.abstractSignHelperSecurityPermitAllConfigurationList =
             abstractSignHelperSecurityPermitAllConfigurationList;
+        SignUtil.iSysUserInfoDOHandlerList = iSysUserInfoDOHandlerList;
     }
 
     public interface SignSendCodeInterface {
@@ -212,21 +216,33 @@ public class SignUtil {
         sysUserDO.setPassword(PasswordConvertUtil.convert(password, checkPasswordBlank));
         sysUserMapper.insert(sysUserDO); // 保存：用户
 
-        SysUserInfoDO sysUserInfoDO = new SysUserInfoDO();
-        sysUserInfoDO.setId(sysUserDO.getId());
-        sysUserInfoDO.setUuid(IdUtil.simpleUUID());
-
-        if (tempSysUserInfoDO == null) {
-            sysUserInfoDO.setNickname(getRandomNickname());
-            sysUserInfoDO.setBio("");
-            sysUserInfoDO.setAvatarUri("");
+        // 可以被覆盖
+        if (CollUtil.isNotEmpty(iSysUserInfoDOHandlerList)) {
+            for (ISysUserInfoDOHandler item : iSysUserInfoDOHandlerList) {
+                item.insertUserInfo(sysUserDO.getId(), tempSysUserInfoDO.getNickname(), tempSysUserInfoDO.getBio(),
+                    tempSysUserInfoDO.getAvatarUri());
+            }
         } else {
-            sysUserInfoDO.setNickname(MyEntityUtil.getNotNullStr(tempSysUserInfoDO.getNickname(), getRandomNickname()));
-            sysUserInfoDO.setBio(MyEntityUtil.getNotNullStr(tempSysUserInfoDO.getBio()));
-            sysUserInfoDO.setAvatarUri(MyEntityUtil.getNotNullStr(tempSysUserInfoDO.getAvatarUri()));
+
+            SysUserInfoDO sysUserInfoDO = new SysUserInfoDO();
+            sysUserInfoDO.setId(sysUserDO.getId());
+            sysUserInfoDO.setUuid(IdUtil.simpleUUID());
+
+            if (tempSysUserInfoDO == null) {
+                sysUserInfoDO.setNickname(getRandomNickname());
+                sysUserInfoDO.setBio("");
+                sysUserInfoDO.setAvatarUri("");
+            } else {
+                sysUserInfoDO
+                    .setNickname(MyEntityUtil.getNotNullStr(tempSysUserInfoDO.getNickname(), getRandomNickname()));
+                sysUserInfoDO.setBio(MyEntityUtil.getNotNullStr(tempSysUserInfoDO.getBio()));
+                sysUserInfoDO.setAvatarUri(MyEntityUtil.getNotNullStr(tempSysUserInfoDO.getAvatarUri()));
+            }
+
+            sysUserInfoMapper.insert(sysUserInfoDO); // 保存：用户基本信息
+
         }
 
-        sysUserInfoMapper.insert(sysUserInfoDO); // 保存：用户基本信息
     }
 
     /**
