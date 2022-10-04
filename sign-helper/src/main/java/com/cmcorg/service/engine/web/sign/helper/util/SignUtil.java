@@ -232,15 +232,18 @@ public class SignUtil {
 
         password = MyRsaUtil.rsaDecrypt(password);
 
-        if (BaseConstant.ADMIN_ACCOUNT.equals(account) && BooleanUtil
-            .isTrue(authProperties.getAdminEnable())) { // 如果是 admin账户，并且配置文件中允许 admin登录
-
-            if (!authProperties.getAdminPassword().equals(password)) {
-                passwordErrorHandler(BaseConstant.ADMIN_ID);
+        if (BaseConstant.ADMIN_ACCOUNT.equals(account)) { // 如果是 admin账户
+            if (BooleanUtil.isTrue(authProperties.getAdminEnable())) { // 并且配置文件中允许 admin登录
+                // 判断：密码错误次数过多，是否被冻结
+                checkLoginBlack(BaseConstant.ADMIN_ID);
+                if (!authProperties.getAdminPassword().equals(password)) {
+                    passwordErrorHandler(BaseConstant.ADMIN_ID);
+                    ApiResultVO.error(BizCodeEnum.ACCOUNT_OR_PASSWORD_NOT_VALID);
+                }
+                return MyJwtUtil.generateJwt(BaseConstant.ADMIN_ID, null);
+            } else {
                 ApiResultVO.error(BizCodeEnum.ACCOUNT_OR_PASSWORD_NOT_VALID);
             }
-
-            return MyJwtUtil.generateJwt(BaseConstant.ADMIN_ID, null);
         }
 
         SysUserDO sysUserDO = lambdaQueryChainWrapper
@@ -252,12 +255,8 @@ public class SignUtil {
             ApiResultVO.error(BizCodeEnum.ACCOUNT_OR_PASSWORD_NOT_VALID);
         }
 
-        // 判断：密码错误次数过多，已被冻结
-        String key = RedisKeyEnum.PRE_LOGIN_BLACK.name() + sysUserDO.getId();
-        boolean exists = redissonClient.getBucket(key).isExists();
-        if (exists) {
-            ApiResultVO.error(BizCodeEnum.TOO_MANY_LOGIN_FAILURES);
-        }
+        // 判断：密码错误次数过多，是否被冻结
+        checkLoginBlack(sysUserDO.getId());
 
         if (StrUtil.isBlank(sysUserDO.getPassword())) {
             ApiResultVO.error(BizCodeEnum.NO_PASSWORD_SET); // 未设置密码，请点击【忘记密码】，进行密码设置
@@ -275,6 +274,19 @@ public class SignUtil {
 
         // 颁发，并返回 jwt
         return MyJwtUtil.generateJwt(sysUserDO.getId(), sysUserDO.getJwtSecretSuf());
+    }
+
+    /**
+     * 判断：密码错误次数过多，是否被冻结
+     */
+    private static void checkLoginBlack(Long id) {
+
+        String key = RedisKeyEnum.PRE_LOGIN_BLACK.name() + id;
+        boolean exists = redissonClient.getBucket(key).isExists();
+        if (exists) {
+            ApiResultVO.error(BizCodeEnum.TOO_MANY_LOGIN_FAILURES);
+        }
+
     }
 
     /**
