@@ -15,7 +15,7 @@ public class SysUserPageDTO extends MyPageDTO {
     @Schema(description = "邮箱")
     private String email;
 
-    @Schema(description = "正常/冻结")
+    @Schema(description = "是否正常")
     private Boolean enableFlag;
 
     @Schema(description = "是否有密码")

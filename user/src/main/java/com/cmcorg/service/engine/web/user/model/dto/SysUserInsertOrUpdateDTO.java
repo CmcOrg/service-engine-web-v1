@@ -44,6 +44,7 @@ public class SysUserInsertOrUpdateDTO extends BaseInsertOrUpdateDTO {
     @Schema(description = "头像uri")
     private String avatarUri;
 
+    @RequestField(formTitle = "是否正常")
     @Schema(description = "正常/冻结")
     private Boolean enableFlag;
 

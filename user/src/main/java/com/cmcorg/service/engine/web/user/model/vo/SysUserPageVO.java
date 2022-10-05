@@ -28,6 +28,7 @@ public class SysUserPageVO {
     @Schema(description = "登录名，会脱敏")
     private String signInName;
 
+    @RequestField(formTitle = "是否正常")
     @Schema(description = "正常/冻结")
     private Boolean enableFlag;
 
