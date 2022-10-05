@@ -9,8 +9,17 @@ import lombok.EqualsAndHashCode;
 @Data
 public class SysUserPageDTO extends MyPageDTO {
 
+    @Schema(description = "主键 id")
+    private Long id;
+
     @Schema(description = "昵称")
     private String nickname;
+
+    @Schema(description = "头像uri")
+    private String avatarUri;
+
+    @Schema(description = "登录名")
+    private String signInName;
 
     @Schema(description = "邮箱")
     private String email;

@@ -20,8 +20,17 @@
         WHERE
         a.del_flag = FALSE
         AND b.nickname != ''
+        <if test="dto.id != null">
+            AND a.id = #{dto.id}
+        </if>
         <if test="dto.nickname != null and dto.nickname != ''">
             AND b.nickname LIKE CONCAT('%', #{dto.nickname}, '%')
+        </if>
+        <if test="dto.avatarUri != null and dto.avatarUri != ''">
+            AND b.avatar_uri LIKE CONCAT('%', #{dto.avatarUri}, '%')
+        </if>
+        <if test="dto.signInName != null and dto.signInName != ''">
+            AND a.sign_in_name LIKE concat('%', #{dto.signInName}, '%')
         </if>
         <if test="dto.email != null and dto.email != ''">
             AND a.email LIKE concat('%', #{dto.email}, '%')
