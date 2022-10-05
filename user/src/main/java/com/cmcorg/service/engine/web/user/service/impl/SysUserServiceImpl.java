@@ -28,7 +28,6 @@ import com.cmcorg.service.engine.web.param.util.MyRsaUtil;
 import com.cmcorg.service.engine.web.param.util.SysParamUtil;
 import com.cmcorg.service.engine.web.role.service.SysRoleRefUserService;
 import com.cmcorg.service.engine.web.role.service.SysRoleService;
-import com.cmcorg.service.engine.web.sign.helper.configuration.ISysUserInfoDOHandler;
 import com.cmcorg.service.engine.web.sign.helper.util.SignUtil;
 import com.cmcorg.service.engine.web.user.exception.BizCodeEnum;
 import com.cmcorg.service.engine.web.user.mapper.SysUserProMapper;
@@ -39,7 +38,6 @@ import com.cmcorg.service.engine.web.user.model.dto.SysUserUpdatePasswordDTO;
 import com.cmcorg.service.engine.web.user.model.vo.SysUserInfoByIdVO;
 import com.cmcorg.service.engine.web.user.model.vo.SysUserPageVO;
 import com.cmcorg.service.engine.web.user.service.SysUserService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -60,12 +58,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
     SysUserMapper sysUserMapper;
     @Resource
     SysRoleService sysRoleService;
-
-    final ISysUserInfoDOHandler iSysUserInfoDOHandler;
-
-    public SysUserServiceImpl(@Autowired(required = false) ISysUserInfoDOHandler iSysUserInfoDOHandler) {
-        this.iSysUserInfoDOHandler = iSysUserInfoDOHandler;
-    }
 
     /**
      * 分页排序查询
@@ -182,7 +174,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
             } else { // 修改：用户
 
                 // 删除子表数据
-                SignUtil.doSignDeleteSub(CollUtil.newHashSet(dto.getId()));
+                SignUtil.doSignDeleteSub(CollUtil.newHashSet(dto.getId()), false);
 
                 SysUserDO sysUserDO = new SysUserDO();
                 sysUserDO.setId(dto.getId());
@@ -194,23 +186,13 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
                 // 新增数据到子表
                 insertOrUpdateSub(sysUserDO, dto);
 
-                // 可以被覆盖
-                if (iSysUserInfoDOHandler != null) {
+                SysUserInfoDO sysUserInfoDO = new SysUserInfoDO();
+                sysUserInfoDO.setId(dto.getId());
+                sysUserInfoDO.setNickname(MyEntityUtil.getNotNullStr(dto.getNickname(), SignUtil.getRandomNickname()));
+                sysUserInfoDO.setBio(MyEntityUtil.getNotNullStr(dto.getBio()));
+                sysUserInfoDO.setAvatarUri(MyEntityUtil.getNotNullStr(dto.getAvatarUri()));
+                sysUserInfoMapper.updateById(sysUserInfoDO);
 
-                    iSysUserInfoDOHandler
-                        .updateUserInfo(dto.getId(), dto.getNickname(), dto.getBio(), dto.getAvatarUri());
-
-                } else {
-
-                    SysUserInfoDO sysUserInfoDO = new SysUserInfoDO();
-                    sysUserInfoDO.setId(dto.getId());
-                    sysUserInfoDO
-                        .setNickname(MyEntityUtil.getNotNullStr(dto.getNickname(), SignUtil.getRandomNickname()));
-                    sysUserInfoDO.setBio(MyEntityUtil.getNotNullStr(dto.getBio()));
-                    sysUserInfoDO.setAvatarUri(MyEntityUtil.getNotNullStr(dto.getAvatarUri()));
-                    sysUserInfoMapper.updateById(sysUserInfoDO);
-
-                }
             }
 
             return BaseBizCodeEnum.OK;

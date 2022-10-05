@@ -26,7 +26,6 @@ import com.cmcorg.engine.web.redisson.util.RedissonUtil;
 import com.cmcorg.service.engine.web.param.util.MyRsaUtil;
 import com.cmcorg.service.engine.web.param.util.SysParamUtil;
 import com.cmcorg.service.engine.web.sign.helper.configuration.AbstractSignHelperSecurityPermitAllConfiguration;
-import com.cmcorg.service.engine.web.sign.helper.configuration.ISysUserInfoDOHandler;
 import com.cmcorg.service.engine.web.sign.helper.exception.BizCodeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
@@ -34,7 +33,6 @@ import org.redisson.api.RAtomicLong;
 import org.redisson.api.RBatch;
 import org.redisson.api.RBucket;
 import org.redisson.api.RedissonClient;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
@@ -54,13 +52,11 @@ public class SignUtil {
     private static AuthProperties authProperties;
     private static List<AbstractSignHelperSecurityPermitAllConfiguration>
         abstractSignHelperSecurityPermitAllConfigurationList;
-    private static ISysUserInfoDOHandler iSysUserInfoDOHandler;
 
     public SignUtil(SysUserInfoMapper sysUserInfoMapper, RedissonClient redissonClient, SysUserMapper sysUserMapper,
         AuthProperties authProperties,
         List<AbstractSignHelperSecurityPermitAllConfiguration> abstractSignHelperSecurityPermitAllConfigurationList,
-        SysRoleRefUserMapper sysRoleRefUserMapper,
-        @Autowired(required = false) ISysUserInfoDOHandler iSysUserInfoDOHandler) {
+        SysRoleRefUserMapper sysRoleRefUserMapper) {
         SignUtil.sysUserInfoMapper = sysUserInfoMapper;
         SignUtil.sysUserMapper = sysUserMapper;
         SignUtil.redissonClient = redissonClient;
@@ -68,7 +64,6 @@ public class SignUtil {
         SignUtil.abstractSignHelperSecurityPermitAllConfigurationList =
             abstractSignHelperSecurityPermitAllConfigurationList;
         SignUtil.sysRoleRefUserMapper = sysRoleRefUserMapper;
-        SignUtil.iSysUserInfoDOHandler = iSysUserInfoDOHandler;
     }
 
     public interface SignSendCodeInterface {
@@ -219,31 +214,21 @@ public class SignUtil {
         sysUserDO.setPassword(PasswordConvertUtil.convert(password, checkPasswordBlank));
         sysUserMapper.insert(sysUserDO); // 保存：用户
 
-        // 可以被覆盖
-        if (iSysUserInfoDOHandler != null) {
-            iSysUserInfoDOHandler
-                .insertUserInfo(sysUserDO.getId(), tempSysUserInfoDO.getNickname(), tempSysUserInfoDO.getBio(),
-                    tempSysUserInfoDO.getAvatarUri());
+        SysUserInfoDO sysUserInfoDO = new SysUserInfoDO();
+        sysUserInfoDO.setId(sysUserDO.getId());
+        sysUserInfoDO.setUuid(IdUtil.simpleUUID());
+
+        if (tempSysUserInfoDO == null) {
+            sysUserInfoDO.setNickname(getRandomNickname());
+            sysUserInfoDO.setBio("");
+            sysUserInfoDO.setAvatarUri("");
         } else {
-
-            SysUserInfoDO sysUserInfoDO = new SysUserInfoDO();
-            sysUserInfoDO.setId(sysUserDO.getId());
-            sysUserInfoDO.setUuid(IdUtil.simpleUUID());
-
-            if (tempSysUserInfoDO == null) {
-                sysUserInfoDO.setNickname(getRandomNickname());
-                sysUserInfoDO.setBio("");
-                sysUserInfoDO.setAvatarUri("");
-            } else {
-                sysUserInfoDO
-                    .setNickname(MyEntityUtil.getNotNullStr(tempSysUserInfoDO.getNickname(), getRandomNickname()));
-                sysUserInfoDO.setBio(MyEntityUtil.getNotNullStr(tempSysUserInfoDO.getBio()));
-                sysUserInfoDO.setAvatarUri(MyEntityUtil.getNotNullStr(tempSysUserInfoDO.getAvatarUri()));
-            }
-
-            sysUserInfoMapper.insert(sysUserInfoDO); // 保存：用户基本信息
-
+            sysUserInfoDO.setNickname(MyEntityUtil.getNotNullStr(tempSysUserInfoDO.getNickname(), getRandomNickname()));
+            sysUserInfoDO.setBio(MyEntityUtil.getNotNullStr(tempSysUserInfoDO.getBio()));
+            sysUserInfoDO.setAvatarUri(MyEntityUtil.getNotNullStr(tempSysUserInfoDO.getAvatarUri()));
         }
+
+        sysUserInfoMapper.insert(sysUserInfoDO); // 保存：用户基本信息
 
         return sysUserDO;
     }
@@ -620,17 +605,19 @@ public class SignUtil {
 
         sysUserMapper.deleteBatchIds(idSet); // 直接：删除用户
 
-        doSignDeleteSub(idSet); // 删除子表数据
+        doSignDeleteSub(idSet, true); // 删除子表数据
 
     }
 
     /**
      * 执行：账号注销，删除子表数据
      */
-    public static void doSignDeleteSub(Set<Long> idSet) {
+    public static void doSignDeleteSub(Set<Long> idSet, boolean removeUserInfoFlag) {
 
-        // 直接：删除用户基本信息
-        ChainWrappers.lambdaUpdateChain(sysUserInfoMapper).in(SysUserInfoDO::getId, idSet).remove();
+        if (removeUserInfoFlag) {
+            // 直接：删除用户基本信息
+            ChainWrappers.lambdaUpdateChain(sysUserInfoMapper).in(SysUserInfoDO::getId, idSet).remove();
+        }
 
         // 直接：删除用户绑定的角色
         ChainWrappers.lambdaUpdateChain(sysRoleRefUserMapper).in(SysRoleRefUserDO::getUserId, idSet).remove();
