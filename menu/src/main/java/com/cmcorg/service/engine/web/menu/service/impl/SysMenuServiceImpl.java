@@ -99,7 +99,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuDO> im
 
             // 获取：没有被禁用的角色 idSet
             List<SysRoleDO> sysRoleDOList = sysRoleService.lambdaQuery().in(BaseEntity::getId, dto.getRoleIdSet())
-                .eq(BaseEntity::getEnableFlag, false).select(BaseEntity::getId).list();
+                .eq(BaseEntity::getEnableFlag, true).select(BaseEntity::getId).list();
 
             Set<Long> roleIdSet = sysRoleDOList.stream().map(BaseEntity::getId).collect(Collectors.toSet());
 

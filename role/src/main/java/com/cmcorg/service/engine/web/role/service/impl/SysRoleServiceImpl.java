@@ -99,7 +99,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleDO> im
             // 获取：没有被禁用的菜单 idSet
             List<SysMenuDO> sysMenuDOList =
                 ChainWrappers.lambdaQueryChain(sysMenuMapper).in(BaseEntity::getId, dto.getMenuIdSet())
-                    .eq(BaseEntity::getEnableFlag, false).select(BaseEntity::getId).list();
+                    .eq(BaseEntity::getEnableFlag, true).select(BaseEntity::getId).list();
 
             Set<Long> menuIdSet = sysMenuDOList.stream().map(BaseEntity::getId).collect(Collectors.toSet());
 
@@ -118,7 +118,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleDO> im
             // 获取：没有被禁用的用户 idSet
             List<SysUserDO> sysUserDOList =
                 ChainWrappers.lambdaQueryChain(sysUserMapper).in(BaseEntity::getId, dto.getMenuIdSet())
-                    .eq(BaseEntity::getEnableFlag, false).select(BaseEntity::getId).list();
+                    .eq(BaseEntity::getEnableFlag, true).select(BaseEntity::getId).list();
 
             Set<Long> userIdSet = sysUserDOList.stream().map(BaseEntity::getId).collect(Collectors.toSet());
 
