@@ -10,10 +10,7 @@ import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
 import com.cmcorg.engine.web.auth.exception.BaseBizCodeEnum;
 import com.cmcorg.engine.web.auth.mapper.SysUserInfoMapper;
 import com.cmcorg.engine.web.auth.mapper.SysUserMapper;
-import com.cmcorg.engine.web.auth.model.entity.BaseEntity;
-import com.cmcorg.engine.web.auth.model.entity.SysRoleRefUserDO;
-import com.cmcorg.engine.web.auth.model.entity.SysUserDO;
-import com.cmcorg.engine.web.auth.model.entity.SysUserInfoDO;
+import com.cmcorg.engine.web.auth.model.entity.*;
 import com.cmcorg.engine.web.auth.model.vo.ApiResultVO;
 import com.cmcorg.engine.web.auth.properties.AuthProperties;
 import com.cmcorg.engine.web.auth.util.MyEntityUtil;
@@ -30,6 +27,7 @@ import com.cmcorg.engine.web.util.util.MyMapUtil;
 import com.cmcorg.service.engine.web.param.util.MyRsaUtil;
 import com.cmcorg.service.engine.web.param.util.SysParamUtil;
 import com.cmcorg.service.engine.web.role.service.SysRoleRefUserService;
+import com.cmcorg.service.engine.web.role.service.SysRoleService;
 import com.cmcorg.service.engine.web.sign.helper.configuration.ISysUserInfoDOHandler;
 import com.cmcorg.service.engine.web.sign.helper.util.SignUtil;
 import com.cmcorg.service.engine.web.user.exception.BizCodeEnum;
@@ -60,6 +58,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
     AuthProperties authProperties;
     @Resource
     SysUserMapper sysUserMapper;
+    @Resource
+    SysRoleService sysRoleService;
 
     final ISysUserInfoDOHandler iSysUserInfoDOHandler;
 
@@ -169,20 +169,20 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
             }
 
             if (dto.getId() == null) { // 新增：用户
+
                 SysUserInfoDO sysUserInfoDO = new SysUserInfoDO();
                 sysUserInfoDO.setNickname(dto.getNickname());
                 sysUserInfoDO.setBio(dto.getBio());
                 sysUserInfoDO.setAvatarUri(dto.getAvatarUri());
                 SysUserDO sysUserDO =
                     SignUtil.insertUser(dto.getPassword(), map, false, sysUserInfoDO, dto.getEnableFlag());
-                insertOrUpdateSub(sysUserDO.getId(), dto); // 新增数据到子表
+
+                insertOrUpdateSub(sysUserDO, dto); // 新增数据到子表
+
             } else { // 修改：用户
 
                 // 删除子表数据
                 SignUtil.doSignDeleteSub(CollUtil.newHashSet(dto.getId()));
-
-                // 新增数据到子表
-                insertOrUpdateSub(dto.getId(), dto);
 
                 SysUserDO sysUserDO = new SysUserDO();
                 sysUserDO.setId(dto.getId());
@@ -191,10 +191,15 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
                 sysUserDO.setSignInName(MyEntityUtil.getNotNullStr(dto.getSignInName()));
                 sysUserMapper.updateById(sysUserDO);
 
+                // 新增数据到子表
+                insertOrUpdateSub(sysUserDO, dto);
+
                 // 可以被覆盖
                 if (iSysUserInfoDOHandler != null) {
+
                     iSysUserInfoDOHandler
                         .updateUserInfo(dto.getId(), dto.getNickname(), dto.getBio(), dto.getAvatarUri());
+
                 } else {
 
                     SysUserInfoDO sysUserInfoDO = new SysUserInfoDO();
@@ -230,15 +235,27 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
     /**
      * 新增/修改：新增数据到子表
      */
-    private void insertOrUpdateSub(Long userId, SysUserInsertOrUpdateDTO dto) {
+    private void insertOrUpdateSub(SysUserDO sysUserDO, SysUserInsertOrUpdateDTO dto) {
+
+        // 如果禁用了，则子表不进行新增操作
+        if (BooleanUtil.isFalse(sysUserDO.getEnableFlag())) {
+            return;
+        }
 
         // 新增数据到：角色用户关联表
         if (CollUtil.isNotEmpty(dto.getRoleIdSet())) {
+
+            // 获取：没有被禁用的角色 idSet
+            List<SysRoleDO> sysRoleDOList = sysRoleService.lambdaQuery().in(BaseEntity::getId, dto.getRoleIdSet())
+                .eq(BaseEntity::getEnableFlag, false).select(BaseEntity::getId).list();
+
+            Set<Long> roleIdSet = sysRoleDOList.stream().map(BaseEntity::getId).collect(Collectors.toSet());
+
             List<SysRoleRefUserDO> insertList = new ArrayList<>();
-            for (Long item : dto.getRoleIdSet()) {
+            for (Long item : roleIdSet) {
                 SysRoleRefUserDO sysRoleRefUserDO = new SysRoleRefUserDO();
                 sysRoleRefUserDO.setRoleId(item);
-                sysRoleRefUserDO.setUserId(userId);
+                sysRoleRefUserDO.setUserId(sysUserDO.getId());
                 insertList.add(sysRoleRefUserDO);
             }
             sysRoleRefUserService.saveBatch(insertList);

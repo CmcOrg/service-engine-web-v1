@@ -6,12 +6,12 @@ import cn.hutool.core.util.BooleanUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
 import com.cmcorg.engine.web.auth.exception.BaseBizCodeEnum;
+import com.cmcorg.engine.web.auth.mapper.SysMenuMapper;
 import com.cmcorg.engine.web.auth.mapper.SysRoleMapper;
-import com.cmcorg.engine.web.auth.model.entity.BaseEntity;
-import com.cmcorg.engine.web.auth.model.entity.SysRoleDO;
-import com.cmcorg.engine.web.auth.model.entity.SysRoleRefMenuDO;
-import com.cmcorg.engine.web.auth.model.entity.SysRoleRefUserDO;
+import com.cmcorg.engine.web.auth.mapper.SysUserMapper;
+import com.cmcorg.engine.web.auth.model.entity.*;
 import com.cmcorg.engine.web.auth.model.vo.ApiResultVO;
 import com.cmcorg.engine.web.auth.util.MyEntityUtil;
 import com.cmcorg.engine.web.model.model.dto.NotEmptyIdSet;
@@ -39,6 +39,10 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleDO> im
     SysRoleRefMenuService sysRoleRefMenuService;
     @Resource
     SysRoleRefUserService sysRoleRefUserService;
+    @Resource
+    SysMenuMapper sysMenuMapper;
+    @Resource
+    SysUserMapper sysUserMapper;
 
     /**
      * 新增/修改
@@ -69,18 +73,38 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleDO> im
         sysRoleDO.setDelFlag(false);
         sysRoleDO.setId(dto.getId());
 
-        if (dto.getId() == null) { // 新增
-            baseMapper.insert(sysRoleDO);
-        } else { // 修改
-            baseMapper.updateById(sysRoleDO);
-            // 先删除子表数据
-            deleteByIdSetSub(CollUtil.newHashSet(dto.getId()));
+        if (dto.getId() != null) {
+            deleteByIdSetSub(CollUtil.newHashSet(dto.getId())); // 先删除子表数据
         }
 
-        // 再插入子表数据
+        saveOrUpdate(sysRoleDO);
+
+        insertOrUpdateSub(dto, sysRoleDO); // 新增 子表数据
+
+        return BaseBizCodeEnum.OK;
+    }
+
+    /**
+     * 新增/修改：新增 子表数据
+     */
+    private void insertOrUpdateSub(SysRoleInsertOrUpdateDTO dto, SysRoleDO sysRoleDO) {
+
+        // 如果禁用了，则子表不进行新增操作
+        if (BooleanUtil.isFalse(sysRoleDO.getEnableFlag())) {
+            return;
+        }
+
         if (CollUtil.isNotEmpty(dto.getMenuIdSet())) {
+
+            // 获取：没有被禁用的菜单 idSet
+            List<SysMenuDO> sysMenuDOList =
+                ChainWrappers.lambdaQueryChain(sysMenuMapper).in(BaseEntity::getId, dto.getMenuIdSet())
+                    .eq(BaseEntity::getEnableFlag, false).select(BaseEntity::getId).list();
+
+            Set<Long> menuIdSet = sysMenuDOList.stream().map(BaseEntity::getId).collect(Collectors.toSet());
+
             List<SysRoleRefMenuDO> insertList = new ArrayList<>();
-            for (Long menuId : dto.getMenuIdSet()) {
+            for (Long menuId : menuIdSet) {
                 SysRoleRefMenuDO sysRoleRefMenuDO = new SysRoleRefMenuDO();
                 sysRoleRefMenuDO.setRoleId(sysRoleDO.getId());
                 sysRoleRefMenuDO.setMenuId(menuId);
@@ -90,8 +114,16 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleDO> im
         }
 
         if (CollUtil.isNotEmpty(dto.getUserIdSet())) {
+
+            // 获取：没有被禁用的用户 idSet
+            List<SysUserDO> sysUserDOList =
+                ChainWrappers.lambdaQueryChain(sysUserMapper).in(BaseEntity::getId, dto.getMenuIdSet())
+                    .eq(BaseEntity::getEnableFlag, false).select(BaseEntity::getId).list();
+
+            Set<Long> userIdSet = sysUserDOList.stream().map(BaseEntity::getId).collect(Collectors.toSet());
+
             List<SysRoleRefUserDO> insertList = new ArrayList<>();
-            for (Long userId : dto.getUserIdSet()) {
+            for (Long userId : userIdSet) {
                 SysRoleRefUserDO sysRoleRefUserDO = new SysRoleRefUserDO();
                 sysRoleRefUserDO.setRoleId(sysRoleDO.getId());
                 sysRoleRefUserDO.setUserId(userId);
@@ -100,7 +132,6 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleDO> im
             sysRoleRefUserService.saveBatch(insertList);
         }
 
-        return BaseBizCodeEnum.OK;
     }
 
     /**
@@ -154,7 +185,7 @@ public class SysRoleServiceImpl extends ServiceImpl<SysRoleMapper, SysRoleDO> im
 
         deleteByIdSetSub(notEmptyIdSet.getIdSet()); // 删除子表数据
 
-        baseMapper.deleteBatchIds(notEmptyIdSet.getIdSet());
+        removeByIds(notEmptyIdSet.getIdSet());
 
         return BaseBizCodeEnum.OK;
     }

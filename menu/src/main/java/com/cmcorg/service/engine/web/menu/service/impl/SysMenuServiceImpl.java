@@ -8,10 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.cmcorg.engine.web.auth.exception.BaseBizCodeEnum;
 import com.cmcorg.engine.web.auth.mapper.SysMenuMapper;
-import com.cmcorg.engine.web.auth.model.entity.BaseEntity;
-import com.cmcorg.engine.web.auth.model.entity.BaseEntityTree;
-import com.cmcorg.engine.web.auth.model.entity.SysMenuDO;
-import com.cmcorg.engine.web.auth.model.entity.SysRoleRefMenuDO;
+import com.cmcorg.engine.web.auth.model.entity.*;
 import com.cmcorg.engine.web.auth.model.vo.ApiResultVO;
 import com.cmcorg.engine.web.auth.util.AuthUserUtil;
 import com.cmcorg.engine.web.auth.util.MyEntityUtil;
@@ -26,6 +23,7 @@ import com.cmcorg.service.engine.web.menu.model.dto.SysMenuPageDTO;
 import com.cmcorg.service.engine.web.menu.model.vo.SysMenuInfoByIdVO;
 import com.cmcorg.service.engine.web.menu.service.SysMenuService;
 import com.cmcorg.service.engine.web.role.service.SysRoleRefMenuService;
+import com.cmcorg.service.engine.web.role.service.SysRoleService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -41,6 +39,8 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuDO> im
 
     @Resource
     SysRoleRefMenuService sysRoleRefMenuService;
+    @Resource
+    SysRoleService sysRoleService;
 
     /**
      * 新增/修改
@@ -79,7 +79,7 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuDO> im
         SysMenuDO sysMenuDO = getEntityByDTO(dto);
         saveOrUpdate(sysMenuDO);
 
-        insertOrUpdateSub(sysMenuDO.getId(), dto); // 新增 子表数据
+        insertOrUpdateSub(sysMenuDO, dto); // 新增 子表数据
 
         return BaseBizCodeEnum.OK;
     }
@@ -87,15 +87,27 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuDO> im
     /**
      * 新增/修改：新增 子表数据
      */
-    private void insertOrUpdateSub(Long id, SysMenuInsertOrUpdateDTO dto) {
+    private void insertOrUpdateSub(SysMenuDO sysMenuDO, SysMenuInsertOrUpdateDTO dto) {
+
+        // 如果禁用了，则子表不进行新增操作
+        if (BooleanUtil.isFalse(sysMenuDO.getEnableFlag())) {
+            return;
+        }
 
         // 新增：菜单角色 关联表数据
         if (CollUtil.isNotEmpty(dto.getRoleIdSet())) {
+
+            // 获取：没有被禁用的角色 idSet
+            List<SysRoleDO> sysRoleDOList = sysRoleService.lambdaQuery().in(BaseEntity::getId, dto.getRoleIdSet())
+                .eq(BaseEntity::getEnableFlag, false).select(BaseEntity::getId).list();
+
+            Set<Long> roleIdSet = sysRoleDOList.stream().map(BaseEntity::getId).collect(Collectors.toSet());
+
             List<SysRoleRefMenuDO> insertList = new ArrayList<>();
-            for (Long item : dto.getRoleIdSet()) {
+            for (Long item : roleIdSet) {
                 SysRoleRefMenuDO sysRoleRefMenuDO = new SysRoleRefMenuDO();
                 sysRoleRefMenuDO.setRoleId(item);
-                sysRoleRefMenuDO.setMenuId(id);
+                sysRoleRefMenuDO.setMenuId(sysMenuDO.getId());
                 insertList.add(sysRoleRefMenuDO);
             }
             sysRoleRefMenuService.saveBatch(insertList);
