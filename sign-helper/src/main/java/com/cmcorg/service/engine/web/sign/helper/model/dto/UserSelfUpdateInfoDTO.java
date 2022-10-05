@@ -4,7 +4,6 @@ import com.cmcorg.engine.web.model.model.constant.BaseRegexConstant;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
-import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Pattern;
 
 @Data
@@ -13,7 +12,6 @@ public class UserSelfUpdateInfoDTO {
     @Schema(description = "头像uri")
     private String avatarUri;
 
-    @NotBlank
     @Pattern(regexp = BaseRegexConstant.NICK_NAME_REGEXP)
     @Schema(description = "昵称")
     private String nickname;
