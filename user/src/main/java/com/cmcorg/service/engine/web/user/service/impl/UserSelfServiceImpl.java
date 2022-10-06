@@ -82,7 +82,7 @@ public class UserSelfServiceImpl extends ServiceImpl<SysUserMapper, SysUserDO> i
         SysUserInfoDO sysUserInfoDO = new SysUserInfoDO();
         sysUserInfoDO.setId(currentUserIdNotAdmin);
         sysUserInfoDO.setNickname(MyEntityUtil.getNotNullStr(dto.getNickname(), SignUtil.getRandomNickname()));
-        sysUserInfoDO.setBio(MyEntityUtil.getNotNullStr(dto.getBio()));
+        sysUserInfoDO.setBio(MyEntityUtil.getNotNullAdnTrimStr(dto.getBio()));
         sysUserInfoDO.setAvatarUri(MyEntityUtil.getNotNullStr(dto.getAvatarUri()));
 
         sysUserInfoMapper.updateById(sysUserInfoDO);
