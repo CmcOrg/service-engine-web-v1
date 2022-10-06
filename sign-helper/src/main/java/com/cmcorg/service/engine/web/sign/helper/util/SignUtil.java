@@ -118,6 +118,12 @@ public class SignUtil {
 
         SysUserDO sysUserDO = getSysUserDOByIdAndRedisKeyEnum(redisKeyEnum, AuthUserUtil.getCurrentUserIdNotAdmin());
 
+        if (RedisKeyEnum.PRE_EMAIL.equals(redisKeyEnum)) {
+            if (StrUtil.isBlank(sysUserDO.getEmail())) {
+                ApiResultVO.error(BizCodeEnum.UNABLE_TO_SEND_VERIFICATION_CODE_BECAUSE_THE_EMAIL_ADDRESS_IS_NOT_BOUND);
+            }
+        }
+
         String code = CodeUtil.getCode();
 
         // 保存到 redis中，设置10分钟过期
