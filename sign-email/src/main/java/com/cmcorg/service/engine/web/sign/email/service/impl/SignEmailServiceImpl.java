@@ -117,7 +117,7 @@ public class SignEmailServiceImpl implements SignEmailService {
 
         return SignUtil
             .sendCode(key, ChainWrappers.lambdaQueryChain(sysUserMapper).eq(SysUserDO::getEmail, dto.getEmail()), true,
-                com.cmcorg.engine.web.email.exception.BizCodeEnum.EMAIL_DOES_NOT_EXIST_PLEASE_RE_ENTER,
+                com.cmcorg.engine.web.email.exception.BizCodeEnum.EMAIL_NOT_REGISTERED,
                 (code) -> MyEmailUtil.send(dto.getEmail(), EmailMessageEnum.FORGOT_PASSWORD, code, false));
     }
 
