@@ -56,7 +56,8 @@ public class UserSelfServiceImpl extends ServiceImpl<SysUserMapper, SysUserDO> i
                 .select(SysUserInfoDO::getAvatarUri, SysUserInfoDO::getNickname, SysUserInfoDO::getBio).one();
 
         SysUserDO sysUserDO = lambdaQuery().eq(BaseEntity::getId, currentUserId)
-            .select(SysUserDO::getEmail, SysUserDO::getPassword, SysUserDO::getSignInName).one();
+            .select(SysUserDO::getEmail, SysUserDO::getPassword, SysUserDO::getSignInName, BaseEntity::getCreateTime)
+            .one();
 
         if (sysUserInfoDO != null && sysUserDO != null) {
             sysUserSelfInfoVO.setAvatarUri(sysUserInfoDO.getAvatarUri());
@@ -65,6 +66,7 @@ public class UserSelfServiceImpl extends ServiceImpl<SysUserMapper, SysUserDO> i
             sysUserSelfInfoVO.setEmail(DesensitizedUtil.email(sysUserDO.getEmail())); // 脱敏
             sysUserSelfInfoVO.setSignInName(DesensitizedUtil.chineseName(sysUserDO.getSignInName())); // 脱敏
             sysUserSelfInfoVO.setPasswordFlag(StrUtil.isNotBlank(sysUserDO.getPassword()));
+            sysUserSelfInfoVO.setCreateTime(sysUserDO.getCreateTime());
         }
 
         return sysUserSelfInfoVO;

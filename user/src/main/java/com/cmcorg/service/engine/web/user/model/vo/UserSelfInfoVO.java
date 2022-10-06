@@ -5,6 +5,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.Date;
+
 @EqualsAndHashCode(callSuper = true)
 @Data
 public class UserSelfInfoVO extends UserSelfUpdateInfoDTO {
@@ -17,5 +19,8 @@ public class UserSelfInfoVO extends UserSelfUpdateInfoDTO {
 
     @Schema(description = "登录名，会脱敏")
     private String signInName;
+
+    @Schema(description = "账号注册时间")
+    private Date createTime;
 
 }
