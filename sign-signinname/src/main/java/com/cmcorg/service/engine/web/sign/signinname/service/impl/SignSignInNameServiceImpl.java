@@ -9,7 +9,6 @@ import com.cmcorg.engine.web.auth.model.vo.ApiResultVO;
 import com.cmcorg.engine.web.auth.util.AuthUserUtil;
 import com.cmcorg.engine.web.redisson.enums.RedisKeyEnum;
 import com.cmcorg.service.engine.web.sign.helper.util.SignUtil;
-import com.cmcorg.service.engine.web.sign.signinname.configuration.SignSignInNameSecurityPermitAllConfiguration;
 import com.cmcorg.service.engine.web.sign.signinname.mode.dto.*;
 import com.cmcorg.service.engine.web.sign.signinname.service.SignSignInNameService;
 import org.springframework.stereotype.Service;
@@ -51,8 +50,8 @@ public class SignSignInNameServiceImpl implements SignSignInNameService {
     @Override
     public String updatePassword(SignSignInNameUpdatePasswordDTO dto) {
 
-        // 如果有更高级的修改密码，则禁用低级的修改密码
-        SignUtil.checkSignLevel(SignSignInNameSecurityPermitAllConfiguration.SIGN_LEVEL);
+        // 检查：登录名，是否可以执行操作
+        checkSignNameCanBeExecuted();
 
         return SignUtil
             .updatePassword(dto.getNewPassword(), dto.getOrigNewPassword(), RedisKeyEnum.PRE_SIGN_IN_NAME, null,
@@ -76,7 +75,18 @@ public class SignSignInNameServiceImpl implements SignSignInNameService {
     @Transactional
     public String signDelete(SignSignInNameSignDeleteDTO dto) {
 
-        // 判断是否有：邮箱或者手机号，或者密码等于空
+        // 检查：登录名，是否可以执行操作
+        checkSignNameCanBeExecuted();
+
+        return SignUtil.signDelete(null, RedisKeyEnum.PRE_SIGN_IN_NAME, dto.getCurrentPassword());
+    }
+
+    /**
+     * 检查：登录名，是否可以执行操作
+     */
+    private void checkSignNameCanBeExecuted() {
+
+        // 判断是否有：邮箱或者手机号，或者密码等于空，即：密码不能为空，并且不能有手机或者邮箱
         boolean exists =
             ChainWrappers.lambdaQueryChain(sysUserMapper).eq(BaseEntity::getId, AuthUserUtil.getCurrentUserIdNotAdmin())
                 .and(i -> i.eq(SysUserDO::getPassword, "").or().ne(SysUserDO::getEmail, "").or()
@@ -86,7 +96,6 @@ public class SignSignInNameServiceImpl implements SignSignInNameService {
             ApiResultVO.error(BaseBizCodeEnum.ILLEGAL_REQUEST);
         }
 
-        return SignUtil.signDelete(null, RedisKeyEnum.PRE_SIGN_IN_NAME, dto.getCurrentPassword());
     }
 
 }

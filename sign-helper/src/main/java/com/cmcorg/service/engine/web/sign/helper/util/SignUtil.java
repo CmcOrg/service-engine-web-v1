@@ -335,7 +335,7 @@ public class SignUtil {
 
         String paramValue = SysParamUtil.getValueById(ParamConstant.RSA_PRIVATE_KEY_ID); // 获取非对称 私钥
 
-        if (StrUtil.isNotBlank(oldPassword)) {
+        if (RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
             checkCurrentPassword(oldPassword, currentUserIdNotAdmin, paramValue);
         }
 
