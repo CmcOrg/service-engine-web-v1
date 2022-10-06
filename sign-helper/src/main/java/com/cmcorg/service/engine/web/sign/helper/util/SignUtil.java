@@ -464,19 +464,19 @@ public class SignUtil {
         return RedissonUtil.doMultiLock("", CollUtil.newHashSet(oldKey, newKey), () -> {
 
             RBucket<String> oldBucket = redissonClient.getBucket(oldKey);
-            if (!RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
-                CodeUtil.checkCode(oldCode, oldBucket.get(), "操作失败：请先获取原账号的验证码", "原账号验证码有误，请重新输入"); // 检查 code是否正确
+            if (RedisKeyEnum.PRE_EMAIL.equals(redisKeyEnum)) {
+                CodeUtil.checkCode(oldCode, oldBucket.get(), "操作失败：请先获取旧邮箱的验证码", "旧邮箱验证码有误，请重新输入"); // 检查 code是否正确
             }
 
             RBucket<String> newBucket = redissonClient.getBucket(newKey);
-            if (!RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
-                CodeUtil.checkCode(newCode, newBucket.get(), "操作失败：请先获取新账号的验证码", "新账号验证码有误，请重新输入"); // 检查 code是否正确
+            if (RedisKeyEnum.PRE_EMAIL.equals(redisKeyEnum)) {
+                CodeUtil.checkCode(newCode, newBucket.get(), "操作失败：请先获取新邮箱的验证码", "新邮箱验证码有误，请重新输入"); // 检查 code是否正确
             }
 
             // 检查：新的登录账号是否存在
             boolean exist = accountIsExist(redisKeyEnum, newAccount, null);
             if (exist) {
-                if (!RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
+                if (RedisKeyEnum.PRE_EMAIL.equals(redisKeyEnum)) {
                     newBucket.delete();
                 }
                 ApiResultVO.error("操作失败：已被其他人绑定，请重试");
@@ -492,7 +492,7 @@ public class SignUtil {
 
             sysUserMapper.updateById(sysUserDO); // 更新：用户
 
-            if (!RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
+            if (RedisKeyEnum.PRE_EMAIL.equals(redisKeyEnum)) {
                 // 删除：验证码
                 oldBucket.delete();
                 newBucket.delete();
