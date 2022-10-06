@@ -66,7 +66,7 @@ public class SignEmailServiceImpl implements SignEmailService {
     public String updatePasswordSendCode() {
 
         return SignUtil.getAccountAndSendCode(RedisKeyEnum.PRE_EMAIL,
-            (code, sysUserDO) -> MyEmailUtil.send(sysUserDO.getEmail(), EmailMessageEnum.UPDATE_PASSWORD, code, false));
+            (code, account) -> MyEmailUtil.send(account, EmailMessageEnum.UPDATE_PASSWORD, code, false));
     }
 
     /**
@@ -140,7 +140,7 @@ public class SignEmailServiceImpl implements SignEmailService {
         SignUtil.checkSignLevel(SignEmailSecurityPermitAllConfiguration.SIGN_LEVEL);
 
         return SignUtil.getAccountAndSendCode(RedisKeyEnum.PRE_EMAIL,
-            (code, sysUserDO) -> MyEmailUtil.send(sysUserDO.getEmail(), EmailMessageEnum.SIGN_DELETE, code, false));
+            (code, account) -> MyEmailUtil.send(account, EmailMessageEnum.SIGN_DELETE, code, false));
     }
 
     /**

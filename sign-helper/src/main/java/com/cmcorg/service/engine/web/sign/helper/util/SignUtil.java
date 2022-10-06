@@ -75,7 +75,7 @@ public class SignUtil {
         /**
          * 回调函数
          */
-        void doAfter(String code, SysUserDO sysUserDO);
+        void doAfter(String code, String sysUserDO);
     }
 
     /**
@@ -116,10 +116,10 @@ public class SignUtil {
     public static String getAccountAndSendCode(RedisKeyEnum redisKeyEnum,
         SignGetAccountAndSendCodeInterface signGetAccountAndSendCodeInterface) {
 
-        SysUserDO sysUserDO = getSysUserDOByIdAndRedisKeyEnum(redisKeyEnum, AuthUserUtil.getCurrentUserIdNotAdmin());
+        String account = getAccountByIdAndRedisKeyEnum(redisKeyEnum, AuthUserUtil.getCurrentUserIdNotAdmin());
 
         if (RedisKeyEnum.PRE_EMAIL.equals(redisKeyEnum)) {
-            if (StrUtil.isBlank(sysUserDO.getEmail())) {
+            if (StrUtil.isBlank(account)) {
                 ApiResultVO.error(BizCodeEnum.UNABLE_TO_SEND_VERIFICATION_CODE_BECAUSE_THE_EMAIL_ADDRESS_IS_NOT_BOUND);
             }
         }
@@ -127,11 +127,11 @@ public class SignUtil {
         String code = CodeUtil.getCode();
 
         // 保存到 redis中，设置10分钟过期
-        redissonClient.getBucket(redisKeyEnum + code)
+        redissonClient.getBucket(redisKeyEnum + account)
             .set(code, BaseConstant.MINUTE_10_EXPIRE_TIME, TimeUnit.MILLISECONDS);
 
         // 执行：发送验证码操作
-        signGetAccountAndSendCodeInterface.doAfter(code, sysUserDO);
+        signGetAccountAndSendCodeInterface.doAfter(code, account);
 
         return BaseBizCodeEnum.SEND_OK;
     }
