@@ -8,7 +8,7 @@ spring:
     nacos:
       server-addr: 139.196.121.3:8848
       config:
-        namespace: game
+        namespace: CmcOrg
         file-extension: yaml
         extension-configs:
           - data-id: project-engine-web-v1.yml
