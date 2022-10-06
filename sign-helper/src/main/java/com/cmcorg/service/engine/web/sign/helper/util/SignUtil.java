@@ -125,7 +125,8 @@ public class SignUtil {
 
         if (RedisKeyEnum.PRE_EMAIL.equals(redisKeyEnum)) {
             if (StrUtil.isBlank(account)) {
-                ApiResultVO.error(BizCodeEnum.UNABLE_TO_SEND_VERIFICATION_CODE_BECAUSE_THE_EMAIL_ADDRESS_IS_NOT_BOUND);
+                ApiResultVO
+                    .error(BaseBizCodeEnum.UNABLE_TO_SEND_VERIFICATION_CODE_BECAUSE_THE_EMAIL_ADDRESS_IS_NOT_BOUND);
             }
         }
 
