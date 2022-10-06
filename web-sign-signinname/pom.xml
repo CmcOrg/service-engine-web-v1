@@ -9,21 +9,21 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>sign-helper</artifactId>
-    <description>登录注册功能包</description>
+    <artifactId>web-sign-signinname</artifactId>
+    <description>登录名登录注册</description>
 
     <dependencies>
-
-        <!-- param -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>param</artifactId>
-        </dependency>
 
         <!-- web-auth-nacos -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>web-auth-nacos</artifactId>
+        </dependency>
+
+        <!-- web-sign-helper -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>web-sign-helper</artifactId>
         </dependency>
 
     </dependencies>

@@ -9,27 +9,21 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>sign-email</artifactId>
-    <description>邮箱登录注册</description>
+    <artifactId>web-sign-helper</artifactId>
+    <description>登录注册功能包</description>
 
     <dependencies>
+
+        <!-- web-param -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>web-param</artifactId>
+        </dependency>
 
         <!-- web-auth-nacos -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>web-auth-nacos</artifactId>
-        </dependency>
-
-        <!-- web-email -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>web-email</artifactId>
-        </dependency>
-
-        <!-- sign-helper -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>sign-helper</artifactId>
         </dependency>
 
     </dependencies>

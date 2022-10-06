@@ -9,22 +9,10 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>user</artifactId>
-    <description>user</description>
+    <artifactId>web-param</artifactId>
+    <description>web-param</description>
 
     <dependencies>
-
-        <!-- sign-helper -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>sign-helper</artifactId>
-        </dependency>
-
-        <!-- role -->
-        <dependency>
-            <groupId>${project.groupId}</groupId>
-            <artifactId>role</artifactId>
-        </dependency>
 
         <!-- web-auth-nacos -->
         <dependency>

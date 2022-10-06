@@ -9,51 +9,51 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>start</artifactId>
+    <artifactId>web-start</artifactId>
     <description>项目启动包</description>
 
     <dependencies>
 
-        <!-- user -->
+        <!-- web-user -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>user</artifactId>
+            <artifactId>web-user</artifactId>
         </dependency>
 
-        <!-- dict -->
+        <!-- web-dict -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>dict</artifactId>
+            <artifactId>web-dict</artifactId>
         </dependency>
 
-        <!-- param -->
+        <!-- web-param -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>param</artifactId>
+            <artifactId>web-param</artifactId>
         </dependency>
 
-        <!-- sign-email -->
+        <!-- web-sign-email -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>sign-email</artifactId>
+            <artifactId>web-sign-email</artifactId>
         </dependency>
 
-        <!-- sign-signinname -->
+        <!-- web-sign-signinname -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>sign-signinname</artifactId>
+            <artifactId>web-sign-signinname</artifactId>
         </dependency>
 
-        <!-- role -->
+        <!-- web-role -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>role</artifactId>
+            <artifactId>web-role</artifactId>
         </dependency>
 
-        <!-- menu -->
+        <!-- web-menu -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>menu</artifactId>
+            <artifactId>web-menu</artifactId>
         </dependency>
 
         <!-- web-auth-nacos -->

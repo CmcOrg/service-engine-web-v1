@@ -14,73 +14,73 @@
     <description>项目顶级 pom.xml，目的：1 方便打包modules 2 依赖版本控制（所以不要在其他 pom.xml里面，添加带有 version标签的依赖）</description>
 
     <modules>
-        <module>start</module>
-        <module>menu</module>
-        <module>role</module>
-        <module>sign-helper</module>
-        <module>sign-signinname</module>
-        <module>sign-email</module>
-        <module>param</module>
-        <module>dict</module>
-        <module>user</module>
+        <module>web-start</module>
+        <module>web-menu</module>
+        <module>web-role</module>
+        <module>web-sign-helper</module>
+        <module>web-sign-signinname</module>
+        <module>web-sign-email</module>
+        <module>web-param</module>
+        <module>web-dict</module>
+        <module>web-user</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
 
-            <!-- user -->
+            <!-- web-user -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>user</artifactId>
+                <artifactId>web-user</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- dict -->
+            <!-- web-dict -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>dict</artifactId>
+                <artifactId>web-dict</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- param -->
+            <!-- web-param -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>param</artifactId>
+                <artifactId>web-param</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- sign-email -->
+            <!-- web-sign-email -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>sign-email</artifactId>
+                <artifactId>web-sign-email</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- sign-signinname -->
+            <!-- web-sign-signinname -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>sign-signinname</artifactId>
+                <artifactId>web-sign-signinname</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- sign-helper -->
+            <!-- web-sign-helper -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>sign-helper</artifactId>
+                <artifactId>web-sign-helper</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- role -->
+            <!-- web-role -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>role</artifactId>
+                <artifactId>web-role</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
-            <!-- menu -->
+            <!-- web-menu -->
             <dependency>
                 <groupId>${project.groupId}</groupId>
-                <artifactId>menu</artifactId>
+                <artifactId>web-menu</artifactId>
                 <version>${project.version}</version>
             </dependency>
 
