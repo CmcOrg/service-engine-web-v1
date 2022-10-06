@@ -469,7 +469,7 @@ public class SignUtil {
             }
 
             // 检查：新的登录账号是否存在
-            boolean exist = accountIsExist(redisKeyEnum, newAccount, currentUserIdNotAdmin);
+            boolean exist = accountIsExist(redisKeyEnum, newAccount, null);
             if (exist) {
                 if (!RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
                     newBucket.delete();
