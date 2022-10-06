@@ -471,7 +471,9 @@ public class SignUtil {
             // 检查：新的登录账号是否存在
             boolean exist = accountIsExist(redisKeyEnum, newAccount, currentUserIdNotAdmin);
             if (exist) {
-                newBucket.delete();
+                if (!RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
+                    newBucket.delete();
+                }
                 ApiResultVO.error("操作失败：已被其他人绑定，请重试");
             }
 
@@ -482,6 +484,7 @@ public class SignUtil {
             setSysUserDOAccountByRedisKeyEnum(redisKeyEnum, newAccount, sysUserDO);
 
             sysUserDO.setJwtSecretSuf(IdUtil.simpleUUID());
+
             sysUserMapper.updateById(sysUserDO); // 更新：用户
 
             if (!RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {

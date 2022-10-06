@@ -50,8 +50,8 @@ public class SignSignInNameServiceImpl implements SignSignInNameService {
     @Override
     public String updatePassword(SignSignInNameUpdatePasswordDTO dto) {
 
-        // 检查：登录名，是否可以执行操作
-        checkSignNameCanBeExecuted();
+        // 检查：登录名，是否不可以执行操作
+        checkSignNameCanBeExecutedAndError();
 
         return SignUtil
             .updatePassword(dto.getNewPassword(), dto.getOrigNewPassword(), RedisKeyEnum.PRE_SIGN_IN_NAME, null,
@@ -75,26 +75,31 @@ public class SignSignInNameServiceImpl implements SignSignInNameService {
     @Transactional
     public String signDelete(SignSignInNameSignDeleteDTO dto) {
 
-        // 检查：登录名，是否可以执行操作
-        checkSignNameCanBeExecuted();
+        // 检查：登录名，是否不可以执行操作
+        checkSignNameCanBeExecutedAndError();
 
         return SignUtil.signDelete(null, RedisKeyEnum.PRE_SIGN_IN_NAME, dto.getCurrentPassword());
     }
 
     /**
-     * 检查：登录名，是否可以执行操作
+     * 检查：登录名，是否不可以执行操作，如果不可以，则抛出异常
      */
-    private void checkSignNameCanBeExecuted() {
-
-        // 判断是否有：邮箱或者手机号，或者密码等于空，即：密码不能为空，并且不能有手机或者邮箱
-        boolean exists =
-            ChainWrappers.lambdaQueryChain(sysUserMapper).eq(BaseEntity::getId, AuthUserUtil.getCurrentUserIdNotAdmin())
-                .and(i -> i.eq(SysUserDO::getPassword, "").or().ne(SysUserDO::getEmail, "").or()
-                    .ne(SysUserDO::getPhone, "")).exists();
-
-        if (exists) {
+    private void checkSignNameCanBeExecutedAndError() {
+        if (checkSignNameNotCanBeExecuted()) {
             ApiResultVO.error(BaseBizCodeEnum.ILLEGAL_REQUEST);
         }
+    }
+
+    /**
+     * 检查：登录名，是否不可以执行操作
+     */
+    private boolean checkSignNameNotCanBeExecuted() {
+
+        // 判断是否有：邮箱或者手机号，或者密码等于空，即：密码不能为空，并且不能有手机或者邮箱
+        return ChainWrappers.lambdaQueryChain(sysUserMapper)
+            .eq(BaseEntity::getId, AuthUserUtil.getCurrentUserIdNotAdmin()).and(
+                i -> i.eq(SysUserDO::getPassword, "").or().ne(SysUserDO::getEmail, "").or().ne(SysUserDO::getPhone, ""))
+            .exists();
 
     }
 
