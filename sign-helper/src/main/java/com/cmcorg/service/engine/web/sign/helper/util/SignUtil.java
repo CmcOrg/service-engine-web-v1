@@ -306,6 +306,10 @@ public class SignUtil {
      */
     private static void passwordErrorHandler(Long userId) {
 
+        if (userId == null) {
+            ApiResultVO.sysError();
+        }
+
         RAtomicLong atomicLong = redissonClient.getAtomicLong(RedisKeyEnum.PRE_PASSWORD_ERROR_COUNT.name() + userId);
 
         long count = atomicLong.incrementAndGet(); // 次数 + 1
@@ -329,11 +333,12 @@ public class SignUtil {
 
         Long currentUserIdNotAdmin = AuthUserUtil.getCurrentUserIdNotAdmin();
 
+        String paramValue = SysParamUtil.getValueById(ParamConstant.RSA_PRIVATE_KEY_ID); // 获取非对称 私钥
+
         if (StrUtil.isNotBlank(oldPassword)) {
-            checkCurrentPassword(oldPassword, currentUserIdNotAdmin);
+            checkCurrentPassword(oldPassword, currentUserIdNotAdmin, paramValue);
         }
 
-        String paramValue = SysParamUtil.getValueById(ParamConstant.RSA_PRIVATE_KEY_ID); // 获取非对称 私钥
         newPassword = MyRsaUtil.rsaDecrypt(newPassword, paramValue);
         origNewPassword = MyRsaUtil.rsaDecrypt(origNewPassword, paramValue);
 
@@ -371,7 +376,10 @@ public class SignUtil {
     /**
      * 检查：当前密码是否正确
      */
-    private static void checkCurrentPassword(String currentPassword, Long currentUserIdNotAdmin) {
+    private static void checkCurrentPassword(String currentPassword, Long currentUserIdNotAdmin, String paramValue) {
+
+        // 判断：密码错误次数过多，是否被冻结
+        checkTooManyPasswordErrors(currentUserIdNotAdmin);
 
         SysUserDO sysUserDO = ChainWrappers.lambdaQueryChain(sysUserMapper).eq(BaseEntity::getId, currentUserIdNotAdmin)
             .select(SysUserDO::getPassword).one();
@@ -380,8 +388,14 @@ public class SignUtil {
             ApiResultVO.error(BizCodeEnum.USER_DOES_NOT_EXIST);
         }
 
+        if (paramValue == null) {
+            currentPassword = MyRsaUtil.rsaDecrypt(currentPassword);
+        } else {
+            currentPassword = MyRsaUtil.rsaDecrypt(currentPassword, paramValue);
+        }
+
         if (!PasswordConvertUtil.match(sysUserDO.getPassword(), currentPassword)) {
-            passwordErrorHandler(sysUserDO.getId());
+            passwordErrorHandler(currentUserIdNotAdmin);
             ApiResultVO.error(BizCodeEnum.PASSWORD_NOT_VALID);
         }
 
@@ -434,8 +448,7 @@ public class SignUtil {
         Long currentUserIdNotAdmin = AuthUserUtil.getCurrentUserIdNotAdmin();
 
         if (RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
-            checkTooManyPasswordErrors(currentUserIdNotAdmin);
-            checkCurrentPassword(currentPassword, currentUserIdNotAdmin);
+            checkCurrentPassword(currentPassword, currentUserIdNotAdmin, null);
         }
 
         String oldAccount = getAccountByIdAndRedisKeyEnum(redisKeyEnum, currentUserIdNotAdmin);
@@ -576,7 +589,7 @@ public class SignUtil {
         Long currentUserIdNotAdmin = AuthUserUtil.getCurrentUserIdNotAdmin();
 
         if (StrUtil.isNotBlank(currentPassword)) {
-            checkCurrentPassword(currentPassword, currentUserIdNotAdmin);
+            checkCurrentPassword(currentPassword, currentUserIdNotAdmin, null);
         }
 
         String account = getAccountByIdAndRedisKeyEnum(redisKeyEnum, currentUserIdNotAdmin);

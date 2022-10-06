@@ -1,8 +1,12 @@
 package com.cmcorg.service.engine.web.sign.signinname.service.impl;
 
 import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
+import com.cmcorg.engine.web.auth.exception.BaseBizCodeEnum;
 import com.cmcorg.engine.web.auth.mapper.SysUserMapper;
+import com.cmcorg.engine.web.auth.model.entity.BaseEntity;
 import com.cmcorg.engine.web.auth.model.entity.SysUserDO;
+import com.cmcorg.engine.web.auth.model.vo.ApiResultVO;
+import com.cmcorg.engine.web.auth.util.AuthUserUtil;
 import com.cmcorg.engine.web.redisson.enums.RedisKeyEnum;
 import com.cmcorg.service.engine.web.sign.helper.util.SignUtil;
 import com.cmcorg.service.engine.web.sign.signinname.configuration.SignSignInNameSecurityPermitAllConfiguration;
@@ -69,10 +73,18 @@ public class SignSignInNameServiceImpl implements SignSignInNameService {
      * 账号注销
      */
     @Override
+    @Transactional
     public String signDelete(SignSignInNameSignDeleteDTO dto) {
 
-        // 如果有更高级的注销，则禁用低级的注销
-        SignUtil.checkSignLevel(SignSignInNameSecurityPermitAllConfiguration.SIGN_LEVEL);
+        // 判断是否有：邮箱或者手机号，或者密码等于空
+        boolean exists =
+            ChainWrappers.lambdaQueryChain(sysUserMapper).eq(BaseEntity::getId, AuthUserUtil.getCurrentUserIdNotAdmin())
+                .and(i -> i.eq(SysUserDO::getPassword, "").or().ne(SysUserDO::getEmail, "").or()
+                    .ne(SysUserDO::getPhone, "")).exists();
+
+        if (exists) {
+            ApiResultVO.error(BaseBizCodeEnum.ILLEGAL_REQUEST);
+        }
 
         return SignUtil.signDelete(null, RedisKeyEnum.PRE_SIGN_IN_NAME, dto.getCurrentPassword());
     }

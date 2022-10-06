@@ -147,6 +147,7 @@ public class SignEmailServiceImpl implements SignEmailService {
      * 账号注销
      */
     @Override
+    @Transactional
     public String signDelete(NotBlankCodeDTO dto) {
 
         // 如果有更高级的账号注销，则禁用低级的账号注销
