@@ -58,8 +58,8 @@ public class SignEmailController {
 
     @PostMapping(value = "/updateAccount/sendCode")
     @Operation(summary = "修改邮箱-发送验证码")
-    public ApiResultVO<String> updateAccountSendCode(@RequestBody @Valid EmailNotBlankDTO dto) {
-        return ApiResultVO.ok(baseService.updateAccountSendCode(dto));
+    public ApiResultVO<String> updateAccountSendCode() {
+        return ApiResultVO.ok(baseService.updateAccountSendCode());
     }
 
     @PostMapping(value = "/updateAccount")

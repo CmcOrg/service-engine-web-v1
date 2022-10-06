@@ -87,7 +87,12 @@ public class SignUtil {
         return RedissonUtil.doLock(key, () -> {
 
             // 判断是否存在
-            boolean exists = lambdaQueryChainWrapper.exists();
+            boolean exists;
+            if (lambdaQueryChainWrapper == null) {
+                exists = true;
+            } else {
+                exists = lambdaQueryChainWrapper.exists();
+            }
 
             if (mustExist) {
                 if (!exists) {

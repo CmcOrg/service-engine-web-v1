@@ -15,7 +15,7 @@ public interface SignEmailService {
 
     String updatePassword(SignEmailUpdatePasswordDTO dto);
 
-    String updateAccountSendCode(EmailNotBlankDTO dto);
+    String updateAccountSendCode();
 
     String updateAccount(SignEmailUpdateAccountDTO dto);
 

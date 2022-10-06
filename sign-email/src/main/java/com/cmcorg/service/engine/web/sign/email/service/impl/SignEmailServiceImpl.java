@@ -3,6 +3,7 @@ package com.cmcorg.service.engine.web.sign.email.service.impl;
 import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
 import com.cmcorg.engine.web.auth.mapper.SysUserMapper;
 import com.cmcorg.engine.web.auth.model.entity.SysUserDO;
+import com.cmcorg.engine.web.auth.util.AuthUserUtil;
 import com.cmcorg.engine.web.email.model.enums.EmailMessageEnum;
 import com.cmcorg.engine.web.email.util.MyEmailUtil;
 import com.cmcorg.engine.web.model.model.dto.NotBlankCodeDTO;
@@ -84,14 +85,15 @@ public class SignEmailServiceImpl implements SignEmailService {
      * 修改邮箱-发送验证码
      */
     @Override
-    public String updateAccountSendCode(EmailNotBlankDTO dto) {
+    public String updateAccountSendCode() {
 
-        String key = RedisKeyEnum.PRE_EMAIL + dto.getEmail();
+        String currentUserEmailNotAdmin = AuthUserUtil.getCurrentUserEmailNotAdmin();
 
-        return SignUtil
-            .sendCode(key, ChainWrappers.lambdaQueryChain(sysUserMapper).eq(SysUserDO::getEmail, dto.getEmail()), true,
-                com.cmcorg.engine.web.email.exception.BizCodeEnum.EMAIL_DOES_NOT_EXIST_PLEASE_RE_ENTER,
-                (code) -> MyEmailUtil.send(dto.getEmail(), EmailMessageEnum.UPDATE_EMAIL, code, false));
+        String key = RedisKeyEnum.PRE_EMAIL + currentUserEmailNotAdmin;
+
+        return SignUtil.sendCode(key, null, true,
+            com.cmcorg.engine.web.email.exception.BizCodeEnum.EMAIL_DOES_NOT_EXIST_PLEASE_RE_ENTER,
+            (code) -> MyEmailUtil.send(currentUserEmailNotAdmin, EmailMessageEnum.UPDATE_EMAIL, code, false));
     }
 
     /**
