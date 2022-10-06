@@ -94,20 +94,6 @@
                 <scope>provided</scope>
             </dependency>
 
-            <!-- auth-nacos -->
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>auth-nacos</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
-            <!-- email -->
-            <dependency>
-                <groupId>${project.groupId}</groupId>
-                <artifactId>email</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-
             <!-- 其他依赖 ↑ -->
 
         </dependencies>
