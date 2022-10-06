@@ -14,16 +14,16 @@
 
     <dependencies>
 
-        <!-- auth-nacos -->
+        <!-- web-auth-nacos -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>auth-nacos</artifactId>
+            <artifactId>web-auth-nacos</artifactId>
         </dependency>
 
-        <!-- email -->
+        <!-- web-email -->
         <dependency>
             <groupId>${project.groupId}</groupId>
-            <artifactId>email</artifactId>
+            <artifactId>web-email</artifactId>
         </dependency>
 
         <!-- sign-helper -->
