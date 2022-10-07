@@ -17,7 +17,6 @@ import com.cmcorg.service.engine.web.param.model.dto.SysParamInsertOrUpdateDTO;
 import com.cmcorg.service.engine.web.param.model.dto.SysParamPageDTO;
 import com.cmcorg.service.engine.web.param.service.SysParamService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Set;
 
@@ -30,7 +29,6 @@ public class SysParamServiceImpl extends ServiceImpl<SysParamMapper, SysParamDO>
      * 新增/修改
      */
     @Override
-    @Transactional
     public String insertOrUpdate(SysParamInsertOrUpdateDTO dto) {
 
         SysParamDO sysParamDO = new SysParamDO();
@@ -71,7 +69,6 @@ public class SysParamServiceImpl extends ServiceImpl<SysParamMapper, SysParamDO>
      * 批量删除
      */
     @Override
-    @Transactional
     public String deleteByIdSet(NotEmptyIdSet notEmptyIdSet) {
 
         for (Long item : notDeleteIdSet) {
