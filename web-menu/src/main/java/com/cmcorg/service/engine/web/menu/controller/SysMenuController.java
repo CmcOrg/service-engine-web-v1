@@ -26,7 +26,7 @@ import java.util.List;
 
 @WebPage(type = PageTypeEnum.ADMIN, title = "菜单管理")
 @RestController
-@RequestMapping(value = "/sysMenu")
+@RequestMapping(value = "/sys/menu")
 @Tag(name = "菜单-管理")
 public class SysMenuController {
 

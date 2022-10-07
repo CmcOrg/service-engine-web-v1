@@ -20,7 +20,6 @@ import com.cmcorg.service.engine.web.sign.helper.util.SignUtil;
 import com.cmcorg.service.engine.web.user.model.vo.UserSelfInfoVO;
 import com.cmcorg.service.engine.web.user.service.UserSelfService;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 
@@ -76,7 +75,6 @@ public class UserSelfServiceImpl extends ServiceImpl<SysUserMapper, SysUserDO> i
      * 当前用户：基本信息：修改
      */
     @Override
-    @Transactional
     public String userSelfUpdateInfo(UserSelfUpdateInfoDTO dto) {
 
         Long currentUserIdNotAdmin = AuthUserUtil.getCurrentUserIdNotAdmin();
@@ -96,7 +94,6 @@ public class UserSelfServiceImpl extends ServiceImpl<SysUserMapper, SysUserDO> i
      * 当前用户：刷新jwt私钥后缀
      */
     @Override
-    @Transactional
     public String userSelfRefreshJwtSecretSuf() {
 
         SysUserDO sysUserDO = new SysUserDO();

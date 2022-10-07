@@ -27,7 +27,7 @@ import java.util.List;
 @WebPage(type = PageTypeEnum.ADMIN, title = "字典管理")
 @Tag(name = "字典-管理")
 @RestController
-@RequestMapping("/sysDict")
+@RequestMapping("/sys/dict")
 public class SysDictController {
 
     @Resource

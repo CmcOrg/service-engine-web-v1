@@ -297,7 +297,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
      * 刷新用户 jwt私钥后缀
      */
     @Override
-    @Transactional
     public String refreshJwtSecretSuf(NotEmptyIdSet notEmptyIdSet, String password) {
 
         List<SysUserDO> updateList = new ArrayList<>();
@@ -321,7 +320,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
      * 批量重置头像
      */
     @Override
-    @Transactional
     public String resetAvatar(NotEmptyIdSet notEmptyIdSet) {
 
         ChainWrappers.lambdaUpdateChain(sysUserInfoMapper).in(SysUserInfoDO::getId, notEmptyIdSet.getIdSet())
@@ -334,7 +332,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
      * 批量修改密码
      */
     @Override
-    @Transactional
     public String updatePassword(SysUserUpdatePasswordDTO dto) {
 
         boolean passwordFlag = StrUtil.isNotBlank(dto.getNewPassword()) && StrUtil.isNotBlank(dto.getNewOrigPassword());

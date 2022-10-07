@@ -18,7 +18,7 @@ import javax.validation.Valid;
 
 @WebPage(type = PageTypeEnum.NONE)
 @RestController
-@RequestMapping(value = "/userSelf")
+@RequestMapping(value = "/user/self")
 @Tag(name = "用户-自我-管理")
 public class UserSelfController {
 

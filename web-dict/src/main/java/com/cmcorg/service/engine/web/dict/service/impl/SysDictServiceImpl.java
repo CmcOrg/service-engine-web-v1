@@ -209,7 +209,6 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDictDO> im
      * 通过主键 idSet，加减排序号
      */
     @Override
-    @Transactional
     public String addOrderNo(AddOrderNoDTO dto) {
         if (dto.getNumber() == 0) {
             return BaseBizCodeEnum.API_RESULT_OK.getMsg();

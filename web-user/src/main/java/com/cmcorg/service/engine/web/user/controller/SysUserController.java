@@ -27,7 +27,7 @@ import javax.validation.Valid;
 
 @WebPage(type = PageTypeEnum.ADMIN, title = "用户管理")
 @RestController
-@RequestMapping(value = "/sysUser")
+@RequestMapping(value = "/sys/user")
 @Tag(name = "用户-管理")
 public class SysUserController {
 

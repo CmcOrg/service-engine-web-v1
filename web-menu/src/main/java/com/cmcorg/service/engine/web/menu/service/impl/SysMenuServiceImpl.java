@@ -279,7 +279,6 @@ public class SysMenuServiceImpl extends ServiceImpl<SysMenuMapper, SysMenuDO> im
      * 通过主键 idSet，加减排序号
      */
     @Override
-    @Transactional
     public String addOrderNo(AddOrderNoDTO dto) {
 
         if (dto.getNumber() == 0) {

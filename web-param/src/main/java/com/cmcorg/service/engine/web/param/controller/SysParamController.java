@@ -22,7 +22,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 @WebPage(type = PageTypeEnum.ADMIN, title = "系统参数")
-@RequestMapping("/sysParam")
+@RequestMapping("/sys/param")
 @RestController
 @Tag(name = "系统参数-管理")
 public class SysParamController {

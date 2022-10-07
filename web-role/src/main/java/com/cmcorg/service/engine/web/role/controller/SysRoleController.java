@@ -23,7 +23,7 @@ import javax.annotation.Resource;
 import javax.validation.Valid;
 
 @WebPage(type = PageTypeEnum.ADMIN, title = "角色管理")
-@RequestMapping("/sysRole")
+@RequestMapping("/sys/role")
 @RestController
 @Tag(name = "角色-管理")
 public class SysRoleController {
