@@ -5,7 +5,7 @@ import com.cmcorg.generate.page.h5.util.WebJsonToWebUtil;
 public class JavaToWebUtil {
 
     public static void main(String[] args) {
-        WebJsonToWebUtil.exec(); // 生成前端页面
+        WebJsonToWebUtil.exec("D:/GitHub/CmcOrg/frontend-h5-web-v1/"); // 生成前端页面
     }
 
 }
