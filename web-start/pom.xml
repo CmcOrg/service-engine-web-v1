@@ -62,11 +62,15 @@
             <artifactId>web-auth-nacos</artifactId>
         </dependency>
 
+        <!-- 其他依赖 ↓ -->
+
         <!-- generate-page-h5 -->
         <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>generate-page-h5</artifactId>
         </dependency>
+
+        <!-- 其他依赖 ↑ -->
 
     </dependencies>
 
