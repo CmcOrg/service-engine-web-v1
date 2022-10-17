@@ -14,6 +14,7 @@
     <description>项目顶级 pom.xml，目的：1 方便打包modules 2 依赖版本控制（所以不要在其他 pom.xml里面，添加带有 version标签的依赖）</description>
 
     <modules>
+        <module>web-start</module>
         <module>web-menu</module>
         <module>web-role</module>
         <module>web-sign-helper</module>
