@@ -206,6 +206,7 @@ public class SignUtil {
             sysUserDO.setEnableFlag(enableFlag);
         }
         sysUserDO.setDelFlag(false);
+        sysUserDO.setTenantId(BaseConstant.SYS_ID); // 默认：没有租户 id
         sysUserDO.setRemark("");
 
         sysUserDO.setEmail("");
