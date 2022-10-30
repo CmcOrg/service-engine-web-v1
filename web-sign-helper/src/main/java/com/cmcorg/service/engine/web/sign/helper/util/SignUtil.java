@@ -260,7 +260,7 @@ public class SignUtil {
                     passwordErrorHandler(BaseConstant.ADMIN_ID);
                     ApiResultVO.error(BizCodeEnum.ACCOUNT_OR_PASSWORD_NOT_VALID);
                 }
-                return MyJwtUtil.generateJwt(BaseConstant.ADMIN_ID, null);
+                return MyJwtUtil.generateJwt(BaseConstant.ADMIN_ID, null, null);
             } else {
                 ApiResultVO.error(BizCodeEnum.ACCOUNT_OR_PASSWORD_NOT_VALID);
             }
@@ -293,7 +293,7 @@ public class SignUtil {
         }
 
         // 颁发，并返回 jwt
-        return MyJwtUtil.generateJwt(sysUserDO.getId(), sysUserDO.getJwtSecretSuf());
+        return MyJwtUtil.generateJwt(sysUserDO.getId(), sysUserDO.getJwtSecretSuf(), null);
     }
 
     /**
