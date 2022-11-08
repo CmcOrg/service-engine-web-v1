@@ -178,6 +178,9 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDictDO> im
     @Transactional
     public String deleteByIdSet(NotEmptyIdSet notEmptyIdSet) {
 
+        // 根据 idSet删除
+        removeByIds(notEmptyIdSet.getIdSet());
+
         List<SysDictDO> sysDictDOList =
             lambdaQuery().in(BaseEntity::getId, notEmptyIdSet.getIdSet()).eq(SysDictDO::getType, SysDictTypeEnum.DICT)
                 .select(SysDictDO::getDictKey).list();
@@ -185,9 +188,6 @@ public class SysDictServiceImpl extends ServiceImpl<SysDictMapper, SysDictDO> im
         if (CollUtil.isEmpty(sysDictDOList)) {
             return BaseBizCodeEnum.OK;
         }
-
-        // 根据 idSet删除
-        removeByIds(notEmptyIdSet.getIdSet());
 
         // 如果删除是字典项的父级，则把其下的字典项也跟着删除了
         Set<String> dictKeySet = sysDictDOList.stream().map(SysDictDO::getDictKey).collect(Collectors.toSet());
