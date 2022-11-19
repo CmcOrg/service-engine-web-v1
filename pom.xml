@@ -23,10 +23,18 @@
         <module>web-param</module>
         <module>web-dict</module>
         <module>web-user</module>
+        <module>web-sign-wx</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
+
+            <!-- web-sign-wx -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>web-sign-wx</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- web-user -->
             <dependency>
