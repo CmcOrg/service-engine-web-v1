@@ -212,7 +212,9 @@ public class SignPhoneServiceImpl implements SignPhoneService {
     @Override
     public String signInCode(SignPhoneSignInCodeDTO dto) {
 
-        return null;
+        return SignUtil
+            .signInCode(ChainWrappers.lambdaQueryChain(sysUserMapper).eq(SysUserDO::getPhone, dto.getPhone()),
+                dto.getCode(), PRE_REDIS_KEY_ENUM, dto.getPhone());
 
     }
 

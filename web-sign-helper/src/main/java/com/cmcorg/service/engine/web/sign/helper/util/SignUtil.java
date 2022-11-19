@@ -28,6 +28,7 @@ import com.cmcorg.service.engine.web.sign.helper.configuration.AbstractSignHelpe
 import com.cmcorg.service.engine.web.sign.helper.exception.BizCodeEnum;
 import lombok.extern.slf4j.Slf4j;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.redisson.api.RAtomicLong;
 import org.redisson.api.RBatch;
 import org.redisson.api.RBucket;
@@ -158,25 +159,28 @@ public class SignUtil {
 
             RBucket<String> bucket = redissonClient.getBucket(key);
 
-            if (!RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
+            boolean checkCodeFlag =
+                RedisKeyEnum.PRE_EMAIL.equals(redisKeyEnum) || RedisKeyEnum.PRE_PHONE.equals(redisKeyEnum);
+
+            if (checkCodeFlag) {
                 CodeUtil.checkCode(code, bucket.get()); // 检查 code是否正确
             }
 
             // 检查：注册的登录账号是否存在
             boolean exist = accountIsExist(redisKeyEnum, account, null);
             if (exist) {
-                if (!RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
+                if (checkCodeFlag) {
                     bucket.delete(); // 删除：验证码
                 }
                 accountIsExistError();
             }
 
-            Map<RedisKeyEnum, String> map = MapUtil.newHashMap();
-            map.put(redisKeyEnum, account);
+            Map<RedisKeyEnum, String> accountMap = MapUtil.newHashMap();
+            accountMap.put(redisKeyEnum, account);
 
-            SignUtil.insertUser(finalPassword, map, true, null, null); // 新增：用户
+            SignUtil.insertUser(finalPassword, accountMap, true, null, null); // 新增：用户
 
-            if (!RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
+            if (checkCodeFlag) {
                 bucket.delete(); // 删除：验证码
             }
 
@@ -238,6 +242,39 @@ public class SignUtil {
     }
 
     /**
+     * 验证码登录
+     */
+    public static String signInCode(LambdaQueryChainWrapper<SysUserDO> lambdaQueryChainWrapper, String code,
+        RedisKeyEnum redisKeyEnum, String account) {
+
+        // 登录时，获取账号信息
+        final SysUserDO[] sysUserDOArr = {signInGetSysUserDO(lambdaQueryChainWrapper, false)};
+
+        String key = redisKeyEnum + account;
+
+        return RedissonUtil.doLock(key, () -> {
+
+            RBucket<String> bucket = redissonClient.getBucket(key);
+
+            CodeUtil.checkCode(code, bucket.get()); // 检查 code是否正确
+
+            if (sysUserDOArr[0] == null) {
+                // 如果登录的账号不存在，则进行新增
+                Map<RedisKeyEnum, String> accountMap = MapUtil.newHashMap();
+                accountMap.put(redisKeyEnum, account);
+
+                sysUserDOArr[0] = SignUtil.insertUser(null, accountMap, false, null, null);
+            }
+
+            bucket.delete(); // 删除：验证码
+
+            // 登录时，获取：jwt
+            return signInGetJwt(sysUserDOArr[0]);
+
+        }
+    }
+
+    /**
      * 账号密码登录
      */
     public static String signInPassword(LambdaQueryChainWrapper<SysUserDO> lambdaQueryChainWrapper, String password,
@@ -248,7 +285,7 @@ public class SignUtil {
         if (BaseConstant.ADMIN_ACCOUNT.equals(account)) { // 如果是 admin账户
             if (BooleanUtil.isTrue(authProperties.getAdminEnable())) { // 并且配置文件中允许 admin登录
                 // 判断：密码错误次数过多，是否被冻结
-                checkTooManyPasswordErrors(BaseConstant.ADMIN_ID);
+                checkTooManyPasswordError(BaseConstant.ADMIN_ID);
                 if (!authProperties.getAdminPassword().equals(password)) {
                     passwordErrorHandler(BaseConstant.ADMIN_ID);
                     ApiResultVO.error(BizCodeEnum.ACCOUNT_OR_PASSWORD_NOT_VALID);
@@ -259,19 +296,10 @@ public class SignUtil {
             }
         }
 
-        SysUserDO sysUserDO = lambdaQueryChainWrapper
-            .select(SysUserDO::getPassword, BaseEntity::getEnableFlag, SysUserDO::getJwtSecretSuf, BaseEntity::getId)
-            .one();
+        // 登录时，获取账号信息
+        SysUserDO sysUserDO = signInGetSysUserDO(lambdaQueryChainWrapper, true);
 
-        // 账户是否存在
-        if (sysUserDO == null) {
-            ApiResultVO.error(BizCodeEnum.ACCOUNT_OR_PASSWORD_NOT_VALID);
-        }
-
-        // 判断：密码错误次数过多，是否被冻结
-        checkTooManyPasswordErrors(sysUserDO.getId());
-
-        if (StrUtil.isBlank(sysUserDO.getPassword())) {
+        if (StrUtil.isBlank(sysUserDO.getPassword())) { // 备注：这里 sysUserDO不会为 null
             ApiResultVO.error(BizCodeEnum.NO_PASSWORD_SET); // 未设置密码，请点击【忘记密码】，进行密码设置
         }
 
@@ -280,6 +308,17 @@ public class SignUtil {
             ApiResultVO.error(BizCodeEnum.ACCOUNT_OR_PASSWORD_NOT_VALID);
         }
 
+        // 登录时，获取：jwt
+        return signInGetJwt(sysUserDO);
+
+    }
+
+    /**
+     * 登录时，获取：jwt
+     */
+    @Nullable
+    private static String signInGetJwt(SysUserDO sysUserDO) {
+
         // 校验密码，成功之后，再判断是否被冻结，免得透露用户被封号的信息
         if (!sysUserDO.getEnableFlag()) {
             ApiResultVO.error(BizCodeEnum.ACCOUNT_IS_DISABLED);
@@ -287,18 +326,48 @@ public class SignUtil {
 
         // 颁发，并返回 jwt
         return MyJwtUtil.generateJwt(sysUserDO.getId(), sysUserDO.getJwtSecretSuf(), null);
+
+    }
+
+    /**
+     * 登录时，获取：账号信息
+     */
+    @Nullable
+    private static SysUserDO signInGetSysUserDO(LambdaQueryChainWrapper<SysUserDO> lambdaQueryChainWrapper,
+        boolean errorFlag) {
+
+        SysUserDO sysUserDO = lambdaQueryChainWrapper
+            .select(SysUserDO::getPassword, BaseEntity::getEnableFlag, SysUserDO::getJwtSecretSuf, BaseEntity::getId)
+            .one();
+
+        // 账户是否存在
+        if (sysUserDO == null) {
+            if (errorFlag) {
+                ApiResultVO.error(BizCodeEnum.ACCOUNT_OR_PASSWORD_NOT_VALID);
+            } else {
+                return null;
+            }
+        }
+
+        // 判断：密码错误次数过多，是否被冻结
+        checkTooManyPasswordError(sysUserDO.getId());
+
+        return sysUserDO;
+
     }
 
     /**
      * 判断：密码错误次数过多，是否被冻结
      */
-    private static void checkTooManyPasswordErrors(Long id) {
+    private static void checkTooManyPasswordError(Long userId) {
 
-        String lockMessage =
-            redissonClient.<Long, String>getMap(RedisKeyEnum.PRE_TOO_MANY_PASSWORD_ERRORS.name()).get(id);
-        if (StrUtil.isNotBlank(lockMessage)) {
-            ApiResultVO.error(BizCodeEnum.TOO_MANY_PASSWORD_ERRORS);
+        String lockMessageStr =
+            redissonClient.<Long, String>getMap(RedisKeyEnum.PRE_TOO_MANY_PASSWORD_ERROR.name()).get(userId);
+
+        if (StrUtil.isNotBlank(lockMessageStr)) {
+            ApiResultVO.error(BizCodeEnum.TOO_MANY_PASSWORD_ERROR);
         }
+
     }
 
     /**
@@ -319,7 +388,7 @@ public class SignUtil {
         }
         if (count > 10) {
             // 超过十次密码错误，则封禁账号，下次再错误，则才会提示
-            redissonClient.<Long, String>getMap(RedisKeyEnum.PRE_TOO_MANY_PASSWORD_ERRORS.name())
+            redissonClient.<Long, String>getMap(RedisKeyEnum.PRE_TOO_MANY_PASSWORD_ERROR.name())
                 .put(userId, "密码错误次数过多，被锁定的账号");
             atomicLong.delete(); // 清空错误次数
         }
@@ -379,7 +448,7 @@ public class SignUtil {
     private static void checkCurrentPassword(String currentPassword, Long currentUserIdNotAdmin, String paramValue) {
 
         // 判断：密码错误次数过多，是否被冻结
-        checkTooManyPasswordErrors(currentUserIdNotAdmin);
+        checkTooManyPasswordError(currentUserIdNotAdmin);
 
         SysUserDO sysUserDO = ChainWrappers.lambdaQueryChain(sysUserMapper).eq(BaseEntity::getId, currentUserIdNotAdmin)
             .select(SysUserDO::getPassword).one();
@@ -590,7 +659,7 @@ public class SignUtil {
 
             // 移除密码错误次数相关
             batch.getBucket(RedisKeyEnum.PRE_PASSWORD_ERROR_COUNT.name() + sysUserDO.getId()).deleteAsync();
-            batch.getBucket(RedisKeyEnum.PRE_TOO_MANY_PASSWORD_ERRORS.name() + sysUserDO.getId()).deleteAsync();
+            batch.getBucket(RedisKeyEnum.PRE_TOO_MANY_PASSWORD_ERROR.name() + sysUserDO.getId()).deleteAsync();
 
             // 删除：验证码
             batch.getBucket(key).deleteAsync();
