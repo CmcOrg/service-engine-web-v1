@@ -21,21 +21,24 @@ import javax.annotation.Resource;
 @Service
 public class SignEmailServiceImpl implements SignEmailService {
 
+    private static RedisKeyEnum PRE_REDIS_KEY_ENUM = RedisKeyEnum.PRE_EMAIL;
+
     @Resource
     SysUserMapper sysUserMapper;
 
     /**
-     * 发送验证码
+     * 注册-发送验证码
      */
     @Override
     public String signUpSendCode(EmailNotBlankDTO dto) {
 
-        String key = RedisKeyEnum.PRE_EMAIL + dto.getEmail();
+        String key = PRE_REDIS_KEY_ENUM + dto.getEmail();
 
         return SignUtil
             .sendCode(key, ChainWrappers.lambdaQueryChain(sysUserMapper).eq(SysUserDO::getEmail, dto.getEmail()), false,
                 BizCodeEnum.EMAIL_HAS_BEEN_REGISTERED,
                 (code) -> MyEmailUtil.send(dto.getEmail(), EmailMessageEnum.SIGN_UP, code, false));
+
     }
 
     /**
@@ -46,7 +49,8 @@ public class SignEmailServiceImpl implements SignEmailService {
     public String signUp(SignEmailSignUpDTO dto) {
 
         return SignUtil
-            .signUp(dto.getPassword(), dto.getOrigPassword(), dto.getCode(), RedisKeyEnum.PRE_EMAIL, dto.getEmail());
+            .signUp(dto.getPassword(), dto.getOrigPassword(), dto.getCode(), PRE_REDIS_KEY_ENUM, dto.getEmail());
+
     }
 
     /**
@@ -58,6 +62,7 @@ public class SignEmailServiceImpl implements SignEmailService {
         return SignUtil
             .signInPassword(ChainWrappers.lambdaQueryChain(sysUserMapper).eq(SysUserDO::getEmail, dto.getEmail()),
                 dto.getPassword(), dto.getEmail());
+
     }
 
     /**
@@ -66,8 +71,9 @@ public class SignEmailServiceImpl implements SignEmailService {
     @Override
     public String updatePasswordSendCode() {
 
-        return SignUtil.getAccountAndSendCode(RedisKeyEnum.PRE_EMAIL,
+        return SignUtil.getAccountAndSendCode(PRE_REDIS_KEY_ENUM,
             (code, account) -> MyEmailUtil.send(account, EmailMessageEnum.UPDATE_PASSWORD, code, false));
+
     }
 
     /**
@@ -77,8 +83,8 @@ public class SignEmailServiceImpl implements SignEmailService {
     public String updatePassword(SignEmailUpdatePasswordDTO dto) {
 
         return SignUtil
-            .updatePassword(dto.getNewPassword(), dto.getOrigNewPassword(), RedisKeyEnum.PRE_EMAIL, dto.getCode(),
-                null);
+            .updatePassword(dto.getNewPassword(), dto.getOrigNewPassword(), PRE_REDIS_KEY_ENUM, dto.getCode(), null);
+
     }
 
     /**
@@ -89,11 +95,12 @@ public class SignEmailServiceImpl implements SignEmailService {
 
         String currentUserEmailNotAdmin = AuthUserUtil.getCurrentUserEmailNotAdmin();
 
-        String key = RedisKeyEnum.PRE_EMAIL + currentUserEmailNotAdmin;
+        String key = PRE_REDIS_KEY_ENUM + currentUserEmailNotAdmin;
 
         return SignUtil.sendCode(key, null, true,
             com.cmcorg.engine.web.email.exception.BizCodeEnum.EMAIL_DOES_NOT_EXIST_PLEASE_RE_ENTER,
             (code) -> MyEmailUtil.send(currentUserEmailNotAdmin, EmailMessageEnum.UPDATE_EMAIL, code, false));
+
     }
 
     /**
@@ -103,8 +110,8 @@ public class SignEmailServiceImpl implements SignEmailService {
     public String updateAccount(SignEmailUpdateAccountDTO dto) {
 
         return SignUtil
-            .updateAccount(dto.getOldEmailCode(), dto.getNewEmailCode(), RedisKeyEnum.PRE_EMAIL, dto.getNewEmail(),
-                null);
+            .updateAccount(dto.getOldEmailCode(), dto.getNewEmailCode(), PRE_REDIS_KEY_ENUM, dto.getNewEmail(), null);
+
     }
 
     /**
@@ -113,12 +120,13 @@ public class SignEmailServiceImpl implements SignEmailService {
     @Override
     public String forgotPasswordSendCode(EmailNotBlankDTO dto) {
 
-        String key = RedisKeyEnum.PRE_EMAIL + dto.getEmail();
+        String key = PRE_REDIS_KEY_ENUM + dto.getEmail();
 
         return SignUtil
             .sendCode(key, ChainWrappers.lambdaQueryChain(sysUserMapper).eq(SysUserDO::getEmail, dto.getEmail()), true,
                 com.cmcorg.engine.web.email.exception.BizCodeEnum.EMAIL_NOT_REGISTERED,
                 (code) -> MyEmailUtil.send(dto.getEmail(), EmailMessageEnum.FORGOT_PASSWORD, code, false));
+
     }
 
     /**
@@ -128,8 +136,9 @@ public class SignEmailServiceImpl implements SignEmailService {
     public String forgotPassword(SignEmailForgotPasswordDTO dto) {
 
         return SignUtil
-            .forgotPassword(dto.getNewPassword(), dto.getOrigNewPassword(), dto.getCode(), RedisKeyEnum.PRE_EMAIL,
+            .forgotPassword(dto.getNewPassword(), dto.getOrigNewPassword(), dto.getCode(), PRE_REDIS_KEY_ENUM,
                 dto.getEmail(), ChainWrappers.lambdaQueryChain(sysUserMapper).eq(SysUserDO::getEmail, dto.getEmail()));
+
     }
 
     /**
@@ -141,8 +150,9 @@ public class SignEmailServiceImpl implements SignEmailService {
         // 如果有更高级的账号注销-发送验证码，则禁用低级的账号注销-发送验证码
         SignUtil.checkSignLevel(SignEmailSecurityPermitAllConfiguration.SIGN_LEVEL);
 
-        return SignUtil.getAccountAndSendCode(RedisKeyEnum.PRE_EMAIL,
+        return SignUtil.getAccountAndSendCode(PRE_REDIS_KEY_ENUM,
             (code, account) -> MyEmailUtil.send(account, EmailMessageEnum.SIGN_DELETE, code, false));
+
     }
 
     /**
@@ -155,7 +165,8 @@ public class SignEmailServiceImpl implements SignEmailService {
         // 如果有更高级的账号注销，则禁用低级的账号注销
         SignUtil.checkSignLevel(SignEmailSecurityPermitAllConfiguration.SIGN_LEVEL);
 
-        return SignUtil.signDelete(dto.getCode(), RedisKeyEnum.PRE_EMAIL, null);
+        return SignUtil.signDelete(dto.getCode(), PRE_REDIS_KEY_ENUM, null);
+
     }
 
     /**
@@ -164,12 +175,13 @@ public class SignEmailServiceImpl implements SignEmailService {
     @Override
     public String bindAccountSendCode(EmailNotBlankDTO dto) {
 
-        String key = RedisKeyEnum.PRE_EMAIL + dto.getEmail();
+        String key = PRE_REDIS_KEY_ENUM + dto.getEmail();
 
         return SignUtil
             .sendCode(key, ChainWrappers.lambdaQueryChain(sysUserMapper).eq(SysUserDO::getEmail, dto.getEmail()), false,
                 BizCodeEnum.EMAIL_HAS_BEEN_REGISTERED,
                 (code) -> MyEmailUtil.send(dto.getEmail(), EmailMessageEnum.BIND_EMAIL, code, false));
+
     }
 
     /**
@@ -178,7 +190,8 @@ public class SignEmailServiceImpl implements SignEmailService {
     @Override
     public String bindAccount(SignEmailBindAccountDTO dto) {
 
-        return SignUtil.bindAccount(dto.getCode(), RedisKeyEnum.PRE_EMAIL, dto.getEmail());
+        return SignUtil.bindAccount(dto.getCode(), PRE_REDIS_KEY_ENUM, dto.getEmail());
+
     }
 
 }

@@ -19,6 +19,8 @@ import javax.annotation.Resource;
 @Service
 public class SignSignInNameServiceImpl implements SignSignInNameService {
 
+    private static RedisKeyEnum PRE_REDIS_KEY_ENUM = RedisKeyEnum.PRE_SIGN_IN_NAME;
+
     @Resource
     SysUserMapper sysUserMapper;
 
@@ -29,8 +31,8 @@ public class SignSignInNameServiceImpl implements SignSignInNameService {
     @Transactional
     public String signUp(SignSignInNameSignUpDTO dto) {
 
-        return SignUtil
-            .signUp(dto.getPassword(), dto.getOrigPassword(), null, RedisKeyEnum.PRE_SIGN_IN_NAME, dto.getSignInName());
+        return SignUtil.signUp(dto.getPassword(), dto.getOrigPassword(), null, PRE_REDIS_KEY_ENUM, dto.getSignInName());
+
     }
 
     /**
@@ -42,6 +44,7 @@ public class SignSignInNameServiceImpl implements SignSignInNameService {
         return SignUtil.signInPassword(
             ChainWrappers.lambdaQueryChain(sysUserMapper).eq(SysUserDO::getSignInName, dto.getSignInName()),
             dto.getPassword(), dto.getSignInName());
+
     }
 
     /**
@@ -53,9 +56,9 @@ public class SignSignInNameServiceImpl implements SignSignInNameService {
         // 检查：登录名，是否不可以执行操作
         checkSignNameCanBeExecutedAndError();
 
-        return SignUtil
-            .updatePassword(dto.getNewPassword(), dto.getOrigNewPassword(), RedisKeyEnum.PRE_SIGN_IN_NAME, null,
-                dto.getOldPassword());
+        return SignUtil.updatePassword(dto.getNewPassword(), dto.getOrigNewPassword(), PRE_REDIS_KEY_ENUM, null,
+            dto.getOldPassword());
+
     }
 
     /**
@@ -64,8 +67,8 @@ public class SignSignInNameServiceImpl implements SignSignInNameService {
     @Override
     public String updateAccount(SignSignInNameUpdateAccountDTO dto) {
 
-        return SignUtil
-            .updateAccount(null, null, RedisKeyEnum.PRE_SIGN_IN_NAME, dto.getNewSignInName(), dto.getCurrentPassword());
+        return SignUtil.updateAccount(null, null, PRE_REDIS_KEY_ENUM, dto.getNewSignInName(), dto.getCurrentPassword());
+
     }
 
     /**
@@ -78,16 +81,19 @@ public class SignSignInNameServiceImpl implements SignSignInNameService {
         // 检查：登录名，是否不可以执行操作
         checkSignNameCanBeExecutedAndError();
 
-        return SignUtil.signDelete(null, RedisKeyEnum.PRE_SIGN_IN_NAME, dto.getCurrentPassword());
+        return SignUtil.signDelete(null, PRE_REDIS_KEY_ENUM, dto.getCurrentPassword());
+
     }
 
     /**
      * 检查：登录名，是否不可以执行操作，如果不可以，则抛出异常
      */
     private void checkSignNameCanBeExecutedAndError() {
+
         if (checkSignNameNotCanBeExecuted()) {
             ApiResultVO.error(BaseBizCodeEnum.ILLEGAL_REQUEST);
         }
+
     }
 
     /**

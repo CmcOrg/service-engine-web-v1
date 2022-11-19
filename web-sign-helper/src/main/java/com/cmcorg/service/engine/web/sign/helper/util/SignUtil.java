@@ -23,6 +23,7 @@ import com.cmcorg.engine.web.model.model.constant.LogTopicConstant;
 import com.cmcorg.engine.web.model.model.constant.ParamConstant;
 import com.cmcorg.engine.web.redisson.enums.RedisKeyEnum;
 import com.cmcorg.engine.web.redisson.util.RedissonUtil;
+import com.cmcorg.engine.web.util.util.VoidFunc2;
 import com.cmcorg.service.engine.web.sign.helper.configuration.AbstractSignHelperSecurityPermitAllConfiguration;
 import com.cmcorg.service.engine.web.sign.helper.exception.BizCodeEnum;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +39,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
 @Component
 @Slf4j(topic = LogTopicConstant.USER)
@@ -64,25 +66,11 @@ public class SignUtil {
         SignUtil.sysRoleRefUserMapper = sysRoleRefUserMapper;
     }
 
-    public interface SignSendCodeInterface {
-        /**
-         * 回调函数
-         */
-        void doAfter(String code);
-    }
-
-    public interface SignGetAccountAndSendCodeInterface {
-        /**
-         * 回调函数
-         */
-        void doAfter(String code, String sysUserDO);
-    }
-
     /**
      * 发送验证码
      */
     public static String sendCode(String key, LambdaQueryChainWrapper<SysUserDO> lambdaQueryChainWrapper,
-        boolean mustExist, IBizCode iBizCode, SignSendCodeInterface signSendCodeInterface) {
+        boolean mustExist, IBizCode iBizCode, Consumer<String> consumer) {
 
         return RedissonUtil.doLock(key, () -> {
 
@@ -106,10 +94,10 @@ public class SignUtil {
 
             String code = CodeUtil.getCode();
 
-            // 保存到 redis中，设置10分钟过期
+            // 保存到 redis中，设置 10分钟过期
             redissonClient.getBucket(key).set(code, BaseConstant.MINUTE_10_EXPIRE_TIME, TimeUnit.MILLISECONDS);
 
-            signSendCodeInterface.doAfter(code);
+            consumer.accept(code); // 进行额外的处理
 
             return BaseBizCodeEnum.SEND_OK;
         });
@@ -118,8 +106,7 @@ public class SignUtil {
     /**
      * 获取账户信息，并执行发送验证码操作
      */
-    public static String getAccountAndSendCode(RedisKeyEnum redisKeyEnum,
-        SignGetAccountAndSendCodeInterface signGetAccountAndSendCodeInterface) {
+    public static String getAccountAndSendCode(RedisKeyEnum redisKeyEnum, VoidFunc2<String, String> voidFunc2) {
 
         String account = getAccountByIdAndRedisKeyEnum(redisKeyEnum, AuthUserUtil.getCurrentUserIdNotAdmin());
 
@@ -127,6 +114,10 @@ public class SignUtil {
             if (StrUtil.isBlank(account)) {
                 ApiResultVO
                     .error(BaseBizCodeEnum.UNABLE_TO_SEND_VERIFICATION_CODE_BECAUSE_THE_EMAIL_ADDRESS_IS_NOT_BOUND);
+            }
+        } else if (RedisKeyEnum.PRE_PHONE.equals(redisKeyEnum)) {
+            if (StrUtil.isBlank(account)) {
+                ApiResultVO.error(BaseBizCodeEnum.UNABLE_TO_SEND_VERIFICATION_CODE_BECAUSE_THE_PHONE_IS_NOT_BOUND);
             }
         }
 
@@ -137,7 +128,7 @@ public class SignUtil {
             .set(code, BaseConstant.MINUTE_10_EXPIRE_TIME, TimeUnit.MILLISECONDS);
 
         // 执行：发送验证码操作
-        signGetAccountAndSendCodeInterface.doAfter(code, account);
+        voidFunc2.call(code, account);
 
         return BaseBizCodeEnum.SEND_OK;
     }
@@ -417,6 +408,8 @@ public class SignUtil {
             return sysUserDO.getEmail();
         } else if (RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
             return sysUserDO.getSignInName();
+        } else if (RedisKeyEnum.PRE_PHONE.equals(redisKeyEnum)) {
+            return sysUserDO.getPhone();
         } else {
             ApiResultVO.sysError();
             return null; // 这里不会执行，只是为了通过语法检查
@@ -433,6 +426,8 @@ public class SignUtil {
             lambdaQueryChainWrapper.select(SysUserDO::getEmail);
         } else if (RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
             lambdaQueryChainWrapper.select(SysUserDO::getSignInName);
+        } else if (RedisKeyEnum.PRE_PHONE.equals(redisKeyEnum)) {
+            lambdaQueryChainWrapper.select(SysUserDO::getPhone);
         } else {
             ApiResultVO.sysError();
         }
@@ -468,17 +463,26 @@ public class SignUtil {
             RBucket<String> oldBucket = redissonClient.getBucket(oldKey);
             if (RedisKeyEnum.PRE_EMAIL.equals(redisKeyEnum)) {
                 CodeUtil.checkCode(oldCode, oldBucket.get(), "操作失败：请先获取旧邮箱的验证码", "旧邮箱验证码有误，请重新输入"); // 检查 code是否正确
+            } else if (RedisKeyEnum.PRE_PHONE.equals(redisKeyEnum)) {
+                CodeUtil.checkCode(oldCode, oldBucket.get(), "操作失败：请先获取旧手机号码的验证码", "旧手机号码验证码有误，请重新输入"); // 检查 code是否正确
             }
 
             RBucket<String> newBucket = redissonClient.getBucket(newKey);
             if (RedisKeyEnum.PRE_EMAIL.equals(redisKeyEnum)) {
                 CodeUtil.checkCode(newCode, newBucket.get(), "操作失败：请先获取新邮箱的验证码", "新邮箱验证码有误，请重新输入"); // 检查 code是否正确
+            } else if (RedisKeyEnum.PRE_PHONE.equals(redisKeyEnum)) {
+                CodeUtil.checkCode(oldCode, oldBucket.get(), "操作失败：请先获取新手机号码的验证码", "新手机号码验证码有误，请重新输入"); // 检查 code是否正确
             }
 
             // 检查：新的登录账号是否存在
             boolean exist = accountIsExist(redisKeyEnum, newAccount, null);
+
+            // 是否删除：redis中的验证码
+            boolean deleteRedisFlag =
+                RedisKeyEnum.PRE_EMAIL.equals(redisKeyEnum) || RedisKeyEnum.PRE_PHONE.equals(redisKeyEnum);
+
             if (exist) {
-                if (RedisKeyEnum.PRE_EMAIL.equals(redisKeyEnum)) {
+                if (deleteRedisFlag) {
                     newBucket.delete();
                 }
                 ApiResultVO.error("操作失败：已被其他人绑定，请重试");
@@ -494,7 +498,7 @@ public class SignUtil {
 
             sysUserMapper.updateById(sysUserDO); // 更新：用户
 
-            if (RedisKeyEnum.PRE_EMAIL.equals(redisKeyEnum)) {
+            if (deleteRedisFlag) {
                 // 删除：验证码
                 oldBucket.delete();
                 newBucket.delete();
@@ -514,6 +518,8 @@ public class SignUtil {
             sysUserDO.setEmail(newAccount);
         } else if (RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
             sysUserDO.setSignInName(newAccount);
+        } else if (RedisKeyEnum.PRE_PHONE.equals(redisKeyEnum)) {
+            sysUserDO.setPhone(newAccount);
         } else {
             ApiResultVO.sysError();
         }
@@ -531,6 +537,8 @@ public class SignUtil {
             lambdaQueryChainWrapper.eq(SysUserDO::getEmail, newAccount);
         } else if (RedisKeyEnum.PRE_SIGN_IN_NAME.equals(redisKeyEnum)) {
             lambdaQueryChainWrapper.eq(SysUserDO::getSignInName, newAccount);
+        } else if (RedisKeyEnum.PRE_PHONE.equals(redisKeyEnum)) {
+            lambdaQueryChainWrapper.eq(SysUserDO::getPhone, newAccount);
         } else {
             ApiResultVO.sysError();
         }
