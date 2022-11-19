@@ -30,4 +30,9 @@ public interface SignPhoneService {
     String bindAccountSendCode(PhoneNotBlankDTO dto);
 
     String bindAccount(SignPhoneBindAccountDTO dto);
+
+    String signInSendCode(PhoneNotBlankDTO dto);
+
+    String signInCode(SignPhoneSignInCodeDTO dto);
+
 }

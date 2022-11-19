@@ -122,8 +122,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
 
         boolean emailBlank = StrUtil.isBlank(dto.getEmail());
         boolean signInNameBlank = StrUtil.isBlank(dto.getSignInName());
+        boolean phoneBlank = StrUtil.isBlank(dto.getPhone());
 
-        if (emailBlank && signInNameBlank) {
+        if (emailBlank && signInNameBlank && phoneBlank) {
             ApiResultVO.error(BizCodeEnum.ACCOUNT_CANNOT_BE_EMPTY);
         }
 
@@ -148,14 +149,17 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
         if (!signInNameBlank) {
             redisKeyEnumSet.add(RedisKeyEnum.PRE_SIGN_IN_NAME);
         }
+        if (!phoneBlank) {
+            redisKeyEnumSet.add(RedisKeyEnum.PRE_PHONE);
+        }
 
         return RedissonUtil.doMultiLock("", redisKeyEnumSet, () -> {
 
-            Map<RedisKeyEnum, String> map = MapUtil.newHashMap();
+            Map<RedisKeyEnum, String> accountMap = MapUtil.newHashMap();
 
             // 检查：账号是否存在
             for (RedisKeyEnum item : redisKeyEnumSet) {
-                if (accountIsExist(dto, item, map)) {
+                if (accountIsExist(dto, item, accountMap)) {
                     SignUtil.accountIsExistError();
                 }
             }
@@ -167,7 +171,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
                 sysUserInfoDO.setBio(dto.getBio());
                 sysUserInfoDO.setAvatarUri(dto.getAvatarUri());
                 SysUserDO sysUserDO =
-                    SignUtil.insertUser(dto.getPassword(), map, false, sysUserInfoDO, dto.getEnableFlag());
+                    SignUtil.insertUser(dto.getPassword(), accountMap, false, sysUserInfoDO, dto.getEnableFlag());
 
                 insertOrUpdateSub(sysUserDO, dto); // 新增数据到子表
 
@@ -205,11 +209,14 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
     private boolean accountIsExist(SysUserInsertOrUpdateDTO dto, RedisKeyEnum item, Map<RedisKeyEnum, String> map) {
         boolean exist = false;
         if (RedisKeyEnum.PRE_EMAIL.equals(item)) {
-            exist = SignUtil.accountIsExist(RedisKeyEnum.PRE_EMAIL, dto.getEmail(), dto.getId());
+            exist = SignUtil.accountIsExist(item, dto.getEmail(), dto.getId());
             map.put(item, dto.getEmail());
         } else if (RedisKeyEnum.PRE_SIGN_IN_NAME.equals(item)) {
-            exist = SignUtil.accountIsExist(RedisKeyEnum.PRE_SIGN_IN_NAME, dto.getSignInName(), dto.getId());
+            exist = SignUtil.accountIsExist(item, dto.getSignInName(), dto.getId());
             map.put(item, dto.getSignInName());
+        } else if (RedisKeyEnum.PRE_PHONE.equals(item)) {
+            exist = SignUtil.accountIsExist(item, dto.getPhone(), dto.getId());
+            map.put(item, dto.getPhone());
         }
         return exist;
     }

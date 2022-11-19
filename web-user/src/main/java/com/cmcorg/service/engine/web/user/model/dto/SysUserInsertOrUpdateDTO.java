@@ -26,6 +26,11 @@ public class SysUserInsertOrUpdateDTO extends BaseInsertOrUpdateDTO {
     @Schema(description = "邮箱")
     private String email;
 
+    @Size(max = 100)
+    @Pattern(regexp = BaseRegexConstant.PHONE)
+    @Schema(description = "手机号码")
+    private String phone;
+
     @RequestField(formIgnoreFlag = true)
     @Schema(description = "前端加密之后的密码")
     private String password;

@@ -12,7 +12,7 @@ public abstract class AbstractSignHelperSecurityPermitAllConfiguration implement
     private static final String BASE_PRE_URI = "/sign/";
 
     private static final Set<String> URI_TEMP_SET =
-        CollUtil.newHashSet("/sign/up/**", "/sign/in/password", "/forgotPassword/**");
+        CollUtil.newHashSet("/sign/up/**", "/sign/in/**", "/forgotPassword/**");
 
     protected abstract String getSignPreUri();
 

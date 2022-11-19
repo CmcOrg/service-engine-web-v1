@@ -191,4 +191,29 @@ public class SignPhoneServiceImpl implements SignPhoneService {
 
     }
 
+    /**
+     * 手机验证码登录-发送验证码
+     */
+    @Override
+    public String signInSendCode(PhoneNotBlankDTO dto) {
+
+        String key = PRE_REDIS_KEY_ENUM + dto.getPhone();
+
+        return SignUtil
+            .sendCode(key, ChainWrappers.lambdaQueryChain(sysUserMapper).eq(SysUserDO::getPhone, dto.getPhone()), true,
+                com.cmcorg.engine.web.tencent.exception.BizCodeEnum.PHONE_NOT_REGISTERED,
+                (code) -> SmsTencentUtil.sendSignIn(dto.getPhone(), code));
+
+    }
+
+    /**
+     * 手机验证码登录
+     */
+    @Override
+    public String signInCode(SignPhoneSignInCodeDTO dto) {
+
+        return null;
+
+    }
+
 }

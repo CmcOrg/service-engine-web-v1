@@ -104,4 +104,16 @@ public class SignPhoneController {
         return ApiResultVO.ok(baseService.bindAccount(dto));
     }
 
+    @PostMapping(value = "/sign/in/sendCode")
+    @Operation(summary = "手机验证码登录-发送验证码")
+    public ApiResultVO<String> signInSendCode(@RequestBody @Valid PhoneNotBlankDTO dto) {
+        return ApiResultVO.ok(baseService.signInSendCode(dto));
+    }
+
+    @PostMapping(value = "/sign/in/code")
+    @Operation(summary = "手机验证码登录")
+    public ApiResultVO<String> signInCode(@RequestBody @Valid SignPhoneSignInCodeDTO dto) {
+        return ApiResultVO.ok(BaseBizCodeEnum.OK, baseService.signInCode(dto));
+    }
+
 }

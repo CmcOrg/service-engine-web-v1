@@ -209,6 +209,8 @@ public class SignUtil {
                 sysUserDO.setEmail(item.getValue());
             } else if (RedisKeyEnum.PRE_SIGN_IN_NAME.equals(item.getKey())) {
                 sysUserDO.setSignInName(item.getValue());
+            } else if (RedisKeyEnum.PRE_PHONE.equals(item.getKey())) {
+                sysUserDO.setPhone(item.getValue());
             }
         }
 
