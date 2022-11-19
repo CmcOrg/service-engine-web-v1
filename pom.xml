@@ -24,10 +24,18 @@
         <module>web-dict</module>
         <module>web-user</module>
         <module>web-sign-wx</module>
+        <module>web-sign-phone</module>
     </modules>
 
     <dependencyManagement>
         <dependencies>
+
+            <!-- web-sign-phone -->
+            <dependency>
+                <groupId>${project.groupId}</groupId>
+                <artifactId>web-sign-phone</artifactId>
+                <version>${project.version}</version>
+            </dependency>
 
             <!-- web-sign-wx -->
             <dependency>
