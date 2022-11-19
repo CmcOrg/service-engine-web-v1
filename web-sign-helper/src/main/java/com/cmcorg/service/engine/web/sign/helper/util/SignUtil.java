@@ -242,6 +242,29 @@ public class SignUtil {
     }
 
     /**
+     * 直接通过账号登录
+     * 注意：这是一个高风险方法，调用时，请确认账号来源的可靠性！
+     */
+    public static String signInAccount(LambdaQueryChainWrapper<SysUserDO> lambdaQueryChainWrapper,
+        RedisKeyEnum redisKeyEnum, String account) {
+
+        // 登录时，获取账号信息
+        SysUserDO sysUserDO = signInGetSysUserDO(lambdaQueryChainWrapper, false);
+
+        if (sysUserDO == null) {
+            // 如果登录的账号不存在，则进行新增
+            Map<RedisKeyEnum, String> accountMap = MapUtil.newHashMap();
+            accountMap.put(redisKeyEnum, account);
+
+            sysUserDO = SignUtil.insertUser(null, accountMap, false, null, null);
+        }
+
+        // 登录时，获取：jwt
+        return signInGetJwt(sysUserDO);
+
+    }
+
+    /**
      * 验证码登录
      */
     public static String signInCode(LambdaQueryChainWrapper<SysUserDO> lambdaQueryChainWrapper, String code,
