@@ -1,8 +1,11 @@
 package com.cmcorg.service.engine.web.sign.phone.service.impl;
 
+import cn.hutool.core.util.BooleanUtil;
 import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
 import com.cmcorg.engine.web.auth.mapper.SysUserMapper;
 import com.cmcorg.engine.web.auth.model.entity.SysUserDO;
+import com.cmcorg.engine.web.auth.model.vo.ApiResultVO;
+import com.cmcorg.engine.web.auth.properties.AuthProperties;
 import com.cmcorg.engine.web.auth.util.AuthUserUtil;
 import com.cmcorg.engine.web.model.model.dto.NotBlankCodeDTO;
 import com.cmcorg.engine.web.redisson.enums.RedisKeyEnum;
@@ -25,11 +28,16 @@ public class SignPhoneServiceImpl implements SignPhoneService {
     @Resource
     SysUserMapper sysUserMapper;
 
+    @Resource
+    AuthProperties authProperties;
+
     /**
      * 注册-发送验证码
      */
     @Override
     public String signUpSendCode(PhoneNotBlankDTO dto) {
+
+        checkSignUpEnable(); // 检查：是否允许注册
 
         String key = PRE_REDIS_KEY_ENUM + dto.getPhone();
 
@@ -40,11 +48,24 @@ public class SignPhoneServiceImpl implements SignPhoneService {
     }
 
     /**
+     * 检查：是否允许注册
+     */
+    private void checkSignUpEnable() {
+
+        if (BooleanUtil.isFalse(authProperties.getPhoneSignUpEnable())) {
+            ApiResultVO.error("操作失败：不允许手机号码注册，请联系管理员");
+        }
+
+    }
+
+    /**
      * 注册
      */
     @Override
     @Transactional
     public String signUp(SignPhoneSignUpDTO dto) {
+
+        checkSignUpEnable(); // 检查：是否允许注册
 
         return SignUtil
             .signUp(dto.getPassword(), dto.getOrigPassword(), dto.getCode(), PRE_REDIS_KEY_ENUM, dto.getPhone());

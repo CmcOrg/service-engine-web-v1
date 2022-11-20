@@ -1,8 +1,11 @@
 package com.cmcorg.service.engine.web.sign.email.service.impl;
 
+import cn.hutool.core.util.BooleanUtil;
 import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
 import com.cmcorg.engine.web.auth.mapper.SysUserMapper;
 import com.cmcorg.engine.web.auth.model.entity.SysUserDO;
+import com.cmcorg.engine.web.auth.model.vo.ApiResultVO;
+import com.cmcorg.engine.web.auth.properties.AuthProperties;
 import com.cmcorg.engine.web.auth.util.AuthUserUtil;
 import com.cmcorg.engine.web.email.model.enums.EmailMessageEnum;
 import com.cmcorg.engine.web.email.util.MyEmailUtil;
@@ -26,11 +29,16 @@ public class SignEmailServiceImpl implements SignEmailService {
     @Resource
     SysUserMapper sysUserMapper;
 
+    @Resource
+    AuthProperties authProperties;
+
     /**
      * 注册-发送验证码
      */
     @Override
     public String signUpSendCode(EmailNotBlankDTO dto) {
+
+        checkSignUpEnable(); // 检查：是否允许注册
 
         String key = PRE_REDIS_KEY_ENUM + dto.getEmail();
 
@@ -42,11 +50,24 @@ public class SignEmailServiceImpl implements SignEmailService {
     }
 
     /**
+     * 检查：是否允许注册
+     */
+    private void checkSignUpEnable() {
+
+        if (BooleanUtil.isFalse(authProperties.getEmailSignUpEnable())) {
+            ApiResultVO.error("操作失败：不允许邮箱注册，请联系管理员");
+        }
+
+    }
+
+    /**
      * 注册
      */
     @Override
     @Transactional
     public String signUp(SignEmailSignUpDTO dto) {
+
+        checkSignUpEnable(); // 检查：是否允许注册
 
         return SignUtil
             .signUp(dto.getPassword(), dto.getOrigPassword(), dto.getCode(), PRE_REDIS_KEY_ENUM, dto.getEmail());

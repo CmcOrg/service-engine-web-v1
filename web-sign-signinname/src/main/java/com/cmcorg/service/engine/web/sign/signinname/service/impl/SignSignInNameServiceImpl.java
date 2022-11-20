@@ -1,11 +1,13 @@
 package com.cmcorg.service.engine.web.sign.signinname.service.impl;
 
+import cn.hutool.core.util.BooleanUtil;
 import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
 import com.cmcorg.engine.web.auth.exception.BaseBizCodeEnum;
 import com.cmcorg.engine.web.auth.mapper.SysUserMapper;
 import com.cmcorg.engine.web.auth.model.entity.BaseEntity;
 import com.cmcorg.engine.web.auth.model.entity.SysUserDO;
 import com.cmcorg.engine.web.auth.model.vo.ApiResultVO;
+import com.cmcorg.engine.web.auth.properties.AuthProperties;
 import com.cmcorg.engine.web.auth.util.AuthUserUtil;
 import com.cmcorg.engine.web.redisson.enums.RedisKeyEnum;
 import com.cmcorg.service.engine.web.sign.helper.util.SignUtil;
@@ -24,12 +26,19 @@ public class SignSignInNameServiceImpl implements SignSignInNameService {
     @Resource
     SysUserMapper sysUserMapper;
 
+    @Resource
+    AuthProperties authProperties;
+
     /**
      * 注册
      */
     @Override
     @Transactional
     public String signUp(SignSignInNameSignUpDTO dto) {
+
+        if (BooleanUtil.isFalse(authProperties.getSignInNameSignUpEnable())) {
+            ApiResultVO.error("操作失败：不允许注册，请联系管理员");
+        }
 
         return SignUtil.signUp(dto.getPassword(), dto.getOrigPassword(), null, PRE_REDIS_KEY_ENUM, dto.getSignInName());
 
