@@ -91,7 +91,7 @@ public class SignPhoneServiceImpl implements SignPhoneService {
     public String updatePasswordSendCode() {
 
         return SignUtil.getAccountAndSendCode(PRE_REDIS_KEY_ENUM,
-            (code, account) -> SmsTencentUtil.sendResetPassword(account, code));
+            (code, account) -> SmsTencentUtil.sendUpdatePassword(account, code));
 
     }
 
@@ -144,7 +144,7 @@ public class SignPhoneServiceImpl implements SignPhoneService {
         return SignUtil
             .sendCode(key, ChainWrappers.lambdaQueryChain(sysUserMapper).eq(SysUserDO::getPhone, dto.getPhone()), true,
                 com.cmcorg.engine.web.tencent.exception.BizCodeEnum.PHONE_NOT_REGISTERED,
-                (code) -> SmsTencentUtil.sendResetPassword(dto.getPhone(), code));
+                (code) -> SmsTencentUtil.sendForgotPassword(dto.getPhone(), code));
 
     }
 

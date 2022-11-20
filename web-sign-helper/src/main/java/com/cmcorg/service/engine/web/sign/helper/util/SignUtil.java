@@ -96,7 +96,7 @@ public class SignUtil {
             String code = CodeUtil.getCode();
 
             // 保存到 redis中，设置 10分钟过期
-            redissonClient.getBucket(key).set(code, BaseConstant.MINUTE_10_EXPIRE_TIME, TimeUnit.MILLISECONDS);
+            redissonClient.getBucket(key).set(code, BaseConstant.LONG_CODE_EXPIRE_TIME, TimeUnit.MILLISECONDS);
 
             consumer.accept(code); // 进行额外的处理
 
@@ -124,9 +124,9 @@ public class SignUtil {
 
         String code = CodeUtil.getCode();
 
-        // 保存到 redis中，设置10分钟过期
+        // 保存到 redis中，设置 10分钟过期
         redissonClient.getBucket(redisKeyEnum + account)
-            .set(code, BaseConstant.MINUTE_10_EXPIRE_TIME, TimeUnit.MILLISECONDS);
+            .set(code, BaseConstant.LONG_CODE_EXPIRE_TIME, TimeUnit.MILLISECONDS);
 
         // 执行：发送验证码操作
         voidFunc2.call(code, account);
