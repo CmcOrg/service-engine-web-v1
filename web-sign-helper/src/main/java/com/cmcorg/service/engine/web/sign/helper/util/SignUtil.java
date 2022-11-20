@@ -207,6 +207,7 @@ public class SignUtil {
         sysUserDO.setEmail("");
         sysUserDO.setSignInName("");
         sysUserDO.setPhone("");
+        sysUserDO.setWxOpenId("");
 
         for (Map.Entry<RedisKeyEnum, String> item : accountMap.entrySet()) {
             if (RedisKeyEnum.PRE_EMAIL.equals(item.getKey())) {
@@ -215,6 +216,8 @@ public class SignUtil {
                 sysUserDO.setSignInName(item.getValue());
             } else if (RedisKeyEnum.PRE_PHONE.equals(item.getKey())) {
                 sysUserDO.setPhone(item.getValue());
+            } else if (RedisKeyEnum.PRE_WX_OPEN_ID.equals(item.getKey())) {
+                sysUserDO.setWxOpenId(item.getValue());
             }
         }
 
@@ -248,19 +251,25 @@ public class SignUtil {
     public static String signInAccount(LambdaQueryChainWrapper<SysUserDO> lambdaQueryChainWrapper,
         RedisKeyEnum redisKeyEnum, String account) {
 
-        // 登录时，获取账号信息
-        SysUserDO sysUserDO = signInGetSysUserDO(lambdaQueryChainWrapper, false);
+        String key = redisKeyEnum + account;
 
-        if (sysUserDO == null) {
-            // 如果登录的账号不存在，则进行新增
-            Map<RedisKeyEnum, String> accountMap = MapUtil.newHashMap();
-            accountMap.put(redisKeyEnum, account);
+        return RedissonUtil.doLock(key, () -> {
 
-            sysUserDO = SignUtil.insertUser(null, accountMap, false, null, null);
-        }
+            // 登录时，获取账号信息
+            SysUserDO sysUserDO = signInGetSysUserDO(lambdaQueryChainWrapper, false);
 
-        // 登录时，获取：jwt
-        return signInGetJwt(sysUserDO);
+            if (sysUserDO == null) {
+                // 如果登录的账号不存在，则进行新增
+                Map<RedisKeyEnum, String> accountMap = MapUtil.newHashMap();
+                accountMap.put(redisKeyEnum, account);
+
+                sysUserDO = SignUtil.insertUser(null, accountMap, false, null, null);
+            }
+
+            // 登录时，获取：jwt
+            return signInGetJwt(sysUserDO);
+
+        });
 
     }
 

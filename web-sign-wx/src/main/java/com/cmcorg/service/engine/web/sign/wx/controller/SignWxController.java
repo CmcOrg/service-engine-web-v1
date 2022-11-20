@@ -4,6 +4,7 @@ import com.cmcorg.engine.web.auth.exception.BaseBizCodeEnum;
 import com.cmcorg.engine.web.auth.model.vo.ApiResultVO;
 import com.cmcorg.engine.web.model.generate.model.annotation.WebPage;
 import com.cmcorg.engine.web.model.generate.model.enums.PageTypeEnum;
+import com.cmcorg.service.engine.web.sign.wx.model.dto.SignInCodeDTO;
 import com.cmcorg.service.engine.web.sign.wx.model.dto.SignInPhoneCodeDTO;
 import com.cmcorg.service.engine.web.sign.wx.service.SignWxService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -29,6 +30,12 @@ public class SignWxController {
     @Operation(summary = "手机号 code登录")
     public ApiResultVO<String> signInPhoneCode(@RequestBody @Valid SignInPhoneCodeDTO dto) {
         return ApiResultVO.ok(BaseBizCodeEnum.OK, signWxService.signInPhoneCode(dto));
+    }
+
+    @PostMapping(value = "/sign/in/code")
+    @Operation(summary = "微信 code登录")
+    public ApiResultVO<String> signInCode(@RequestBody @Valid SignInCodeDTO dto) {
+        return ApiResultVO.ok(BaseBizCodeEnum.OK, signWxService.signInCode(dto));
     }
 
 }
