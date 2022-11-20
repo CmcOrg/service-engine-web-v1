@@ -294,7 +294,8 @@ public class SignUtil {
             // 登录时，获取：jwt
             return signInGetJwt(sysUserDOArr[0]);
 
-        }
+        });
+
     }
 
     /**
