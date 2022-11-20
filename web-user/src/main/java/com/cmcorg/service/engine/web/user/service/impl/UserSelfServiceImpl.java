@@ -55,8 +55,8 @@ public class UserSelfServiceImpl extends ServiceImpl<SysUserMapper, SysUserDO> i
                 .select(SysUserInfoDO::getAvatarUri, SysUserInfoDO::getNickname, SysUserInfoDO::getBio).one();
 
         SysUserDO sysUserDO = lambdaQuery().eq(BaseEntity::getId, currentUserId)
-            .select(SysUserDO::getEmail, SysUserDO::getPassword, SysUserDO::getSignInName, BaseEntity::getCreateTime)
-            .one();
+            .select(SysUserDO::getEmail, SysUserDO::getPassword, SysUserDO::getSignInName, SysUserDO::getPhone,
+                SysUserDO::getWxOpenId, BaseEntity::getCreateTime).one();
 
         if (sysUserInfoDO != null && sysUserDO != null) {
             sysUserSelfInfoVO.setAvatarUri(sysUserInfoDO.getAvatarUri());
