@@ -43,7 +43,7 @@ public class SignWxServiceImpl implements SignWxService {
     @Override
     public String signInCode(SignInCodeDTO dto) {
 
-        WxOpenIdVO wxOpenIdVO = WxUtil.getOpenIdByCode(dto.getCode());
+        WxOpenIdVO wxOpenIdVO = WxUtil.getWxOpenIdVOByCode(dto.getCode());
 
         // 直接通过：微信 openId登录
         return SignUtil.signInAccount(
