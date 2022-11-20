@@ -28,6 +28,14 @@ public class SysUserPageVO {
     @Schema(description = "登录名，会脱敏")
     private String signInName;
 
+    @RequestField(formTitle = "手机号码")
+    @Schema(description = "手机号码，会脱敏")
+    private String phone;
+
+    @RequestField(formTitle = "微信 openId")
+    @Schema(description = "微信 openId，会脱敏")
+    private String wxOpenId;
+
     @RequestField(formTitle = "是否正常")
     @Schema(description = "正常/冻结")
     private Boolean enableFlag;

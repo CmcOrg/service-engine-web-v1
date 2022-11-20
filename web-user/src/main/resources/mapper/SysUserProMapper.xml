@@ -8,6 +8,8 @@
         a.id AS id,
         a.email AS email,
         a.sign_in_name as signInName,
+        a.phone as phone,
+        a.wx_open_id as wxOpenId,
         a.create_time AS createTime,
         a.update_time AS updateTime,
         a.enable_flag AS enableFlag,
@@ -33,6 +35,12 @@
         </if>
         <if test="dto.email != null and dto.email != ''">
             AND a.email LIKE concat('%', #{dto.email}, '%')
+        </if>
+        <if test="dto.phone != null and dto.phone != ''">
+            AND a.phone LIKE concat('%', #{dto.phone}, '%')
+        </if>
+        <if test="dto.wxOpenId != null and dto.wxOpenId != ''">
+            AND a.wx_open_id LIKE concat('%', #{dto.wxOpenId}, '%')
         </if>
         <if test="dto.enableFlag != null">
             AND a.enable_flag = #{dto.enableFlag}
