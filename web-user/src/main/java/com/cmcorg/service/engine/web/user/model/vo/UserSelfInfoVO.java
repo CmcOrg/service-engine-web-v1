@@ -20,6 +20,9 @@ public class UserSelfInfoVO extends UserSelfUpdateInfoDTO {
     @Schema(description = "登录名，会脱敏")
     private String signInName;
 
+    @Schema(description = "手机号码，会脱敏")
+    private String phone;
+
     @Schema(description = "账号注册时间")
     private Date createTime;
 
