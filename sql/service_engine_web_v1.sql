@@ -377,6 +377,7 @@ CREATE TABLE `sys_user_0`
     `sign_in_name`   varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci  NOT NULL COMMENT '登录名，可以为空',
     `phone`          varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '手机号，可以为空',
     `tenant_id`      bigint                                                        NOT NULL COMMENT '租户主键 id',
+    `wx_open_id`     varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '微信 openId，可以为空',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
   CHARACTER SET = utf8mb4
@@ -408,6 +409,7 @@ CREATE TABLE `sys_user_1`
     `sign_in_name`   varchar(20) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci  NOT NULL COMMENT '登录名，可以为空',
     `phone`          varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '手机号，可以为空',
     `tenant_id`      bigint                                                        NOT NULL COMMENT '租户主键 id',
+    `wx_open_id`     varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci NOT NULL COMMENT '微信 openId，可以为空',
     PRIMARY KEY (`id`) USING BTREE
 ) ENGINE = InnoDB
   CHARACTER SET = utf8mb4
