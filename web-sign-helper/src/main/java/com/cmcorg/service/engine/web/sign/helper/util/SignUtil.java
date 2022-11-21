@@ -249,7 +249,7 @@ public class SignUtil {
      * 注意：这是一个高风险方法，调用时，请确认账号来源的可靠性！
      */
     public static String signInAccount(LambdaQueryChainWrapper<SysUserDO> lambdaQueryChainWrapper,
-        RedisKeyEnum redisKeyEnum, String account) {
+        RedisKeyEnum redisKeyEnum, String account, SysUserInfoDO tempSysUserInfoDO) {
 
         String key = redisKeyEnum + account;
 
@@ -263,7 +263,7 @@ public class SignUtil {
                 Map<RedisKeyEnum, String> accountMap = MapUtil.newHashMap();
                 accountMap.put(redisKeyEnum, account);
 
-                sysUserDO = SignUtil.insertUser(null, accountMap, false, null, null);
+                sysUserDO = SignUtil.insertUser(null, accountMap, false, tempSysUserInfoDO, null);
             }
 
             // 登录时，获取：jwt
@@ -802,11 +802,18 @@ public class SignUtil {
     }
 
     /**
-     * 获取默认的用户名
-     * 备注：不使用邮箱的原因，因为邮箱不符合 用户昵称的规则：只能包含中文，数字，字母，下划线，长度2-20
+     * 获取：默认的用户名
      */
     public static String getRandomNickname() {
-        return "用户昵称" + RandomUtil.randomStringUpper(6);
+        return getRandomNickname("用户昵称");
+    }
+
+    /**
+     * 根据前缀获取：默认的用户名
+     * 备注：不使用邮箱的原因，因为邮箱不符合 用户昵称的规则：只能包含中文，数字，字母，下划线，长度2-20
+     */
+    public static String getRandomNickname(String preStr) {
+        return preStr + RandomUtil.randomStringUpper(6);
     }
 
     /**

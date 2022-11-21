@@ -3,6 +3,7 @@ package com.cmcorg.service.engine.web.sign.wx.service.impl;
 import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
 import com.cmcorg.engine.web.auth.mapper.SysUserMapper;
 import com.cmcorg.engine.web.auth.model.entity.SysUserDO;
+import com.cmcorg.engine.web.auth.model.entity.SysUserInfoDO;
 import com.cmcorg.engine.web.redisson.enums.RedisKeyEnum;
 import com.cmcorg.engine.web.wx.model.vo.WxOpenIdVO;
 import com.cmcorg.engine.web.wx.model.vo.WxPhoneByCodeVO;
@@ -11,6 +12,7 @@ import com.cmcorg.service.engine.web.sign.helper.util.SignUtil;
 import com.cmcorg.service.engine.web.sign.wx.model.dto.SignInCodeDTO;
 import com.cmcorg.service.engine.web.sign.wx.model.dto.SignInPhoneCodeDTO;
 import com.cmcorg.service.engine.web.sign.wx.service.SignWxService;
+import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -33,7 +35,7 @@ public class SignWxServiceImpl implements SignWxService {
         // 直接通过：手机号登录
         return SignUtil.signInAccount(
             ChainWrappers.lambdaQueryChain(sysUserMapper).eq(SysUserDO::getPhone, wxPhoneInfoVO.getPhoneNumber()),
-            RedisKeyEnum.PRE_PHONE, wxPhoneInfoVO.getPhoneNumber());
+            RedisKeyEnum.PRE_PHONE, wxPhoneInfoVO.getPhoneNumber(), getWxSysUserInfoDO());
 
     }
 
@@ -48,7 +50,20 @@ public class SignWxServiceImpl implements SignWxService {
         // 直接通过：微信 openId登录
         return SignUtil.signInAccount(
             ChainWrappers.lambdaQueryChain(sysUserMapper).eq(SysUserDO::getWxOpenId, wxOpenIdVO.getOpenid()),
-            RedisKeyEnum.PRE_WX_OPEN_ID, wxOpenIdVO.getOpenid());
+            RedisKeyEnum.PRE_WX_OPEN_ID, wxOpenIdVO.getOpenid(), getWxSysUserInfoDO());
+
+    }
+
+    /**
+     * 获取：带有昵称的 用户对象
+     */
+    @NotNull
+    private SysUserInfoDO getWxSysUserInfoDO() {
+
+        SysUserInfoDO sysUserInfoDO = new SysUserInfoDO();
+        sysUserInfoDO.setNickname(SignUtil.getRandomNickname("微信用户"));
+
+        return sysUserInfoDO;
 
     }
 
