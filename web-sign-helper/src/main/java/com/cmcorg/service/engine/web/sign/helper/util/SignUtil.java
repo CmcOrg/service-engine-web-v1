@@ -21,7 +21,8 @@ import com.cmcorg.engine.web.model.model.constant.BaseConstant;
 import com.cmcorg.engine.web.model.model.constant.BaseRegexConstant;
 import com.cmcorg.engine.web.model.model.constant.LogTopicConstant;
 import com.cmcorg.engine.web.model.model.constant.ParamConstant;
-import com.cmcorg.engine.web.redisson.enums.RedisKeyEnum;
+import com.cmcorg.engine.web.redisson.model.enums.RedisKeyEnum;
+import com.cmcorg.engine.web.redisson.model.interfaces.IRedisKey;
 import com.cmcorg.engine.web.redisson.util.RedissonUtil;
 import com.cmcorg.engine.web.util.util.VoidFunc2;
 import com.cmcorg.service.engine.web.sign.helper.configuration.AbstractSignHelperSecurityPermitAllConfiguration;
@@ -107,7 +108,8 @@ public class SignUtil {
     /**
      * 获取账户信息，并执行发送验证码操作
      */
-    public static String getAccountAndSendCode(RedisKeyEnum redisKeyEnum, VoidFunc2<String, String> voidFunc2) {
+    public static String getAccountAndSendCode(Enum<? extends IRedisKey> redisKeyEnum,
+        VoidFunc2<String, String> voidFunc2) {
 
         String account = getAccountByIdAndRedisKeyEnum(redisKeyEnum, AuthUserUtil.getCurrentUserIdNotAdmin());
 
@@ -137,8 +139,8 @@ public class SignUtil {
     /**
      * 注册，注意：调用此方法，必须加 事务
      */
-    public static String signUp(String password, String origPassword, String code, RedisKeyEnum redisKeyEnum,
-        String account) {
+    public static String signUp(String password, String origPassword, String code,
+        Enum<? extends IRedisKey> redisKeyEnum, String account) {
 
         if (BaseConstant.ADMIN_ACCOUNT.equals(account)) {
             ApiResultVO.error(BaseBizCodeEnum.THE_ADMIN_ACCOUNT_DOES_NOT_SUPPORT_THIS_OPERATION);
@@ -175,7 +177,7 @@ public class SignUtil {
                 accountIsExistError();
             }
 
-            Map<RedisKeyEnum, String> accountMap = MapUtil.newHashMap();
+            Map<Enum<? extends IRedisKey>, String> accountMap = MapUtil.newHashMap();
             accountMap.put(redisKeyEnum, account);
 
             SignUtil.insertUser(finalPassword, accountMap, true, null, null); // 新增：用户
@@ -191,7 +193,7 @@ public class SignUtil {
     /**
      * 新增：用户
      */
-    public static SysUserDO insertUser(String password, Map<RedisKeyEnum, String> accountMap,
+    public static SysUserDO insertUser(String password, Map<Enum<? extends IRedisKey>, String> accountMap,
         boolean checkPasswordBlank, SysUserInfoDO tempSysUserInfoDO, Boolean enableFlag) {
 
         SysUserDO sysUserDO = new SysUserDO();
@@ -209,7 +211,7 @@ public class SignUtil {
         sysUserDO.setPhone("");
         sysUserDO.setWxOpenId("");
 
-        for (Map.Entry<RedisKeyEnum, String> item : accountMap.entrySet()) {
+        for (Map.Entry<Enum<? extends IRedisKey>, String> item : accountMap.entrySet()) {
             if (RedisKeyEnum.PRE_EMAIL.equals(item.getKey())) {
                 sysUserDO.setEmail(item.getValue());
             } else if (RedisKeyEnum.PRE_SIGN_IN_NAME.equals(item.getKey())) {
@@ -249,7 +251,7 @@ public class SignUtil {
      * 注意：这是一个高风险方法，调用时，请确认账号来源的可靠性！
      */
     public static String signInAccount(LambdaQueryChainWrapper<SysUserDO> lambdaQueryChainWrapper,
-        RedisKeyEnum redisKeyEnum, String account, SysUserInfoDO tempSysUserInfoDO) {
+        Enum<? extends IRedisKey> redisKeyEnum, String account, SysUserInfoDO tempSysUserInfoDO) {
 
         String key = redisKeyEnum + account;
 
@@ -260,7 +262,7 @@ public class SignUtil {
 
             if (sysUserDO == null) {
                 // 如果登录的账号不存在，则进行新增
-                Map<RedisKeyEnum, String> accountMap = MapUtil.newHashMap();
+                Map<Enum<? extends IRedisKey>, String> accountMap = MapUtil.newHashMap();
                 accountMap.put(redisKeyEnum, account);
 
                 sysUserDO = SignUtil.insertUser(null, accountMap, false, tempSysUserInfoDO, null);
@@ -277,7 +279,7 @@ public class SignUtil {
      * 验证码登录
      */
     public static String signInCode(LambdaQueryChainWrapper<SysUserDO> lambdaQueryChainWrapper, String code,
-        RedisKeyEnum redisKeyEnum, String account) {
+        Enum<? extends IRedisKey> redisKeyEnum, String account) {
 
         // 登录时，获取账号信息
         final SysUserDO[] sysUserDOArr = {signInGetSysUserDO(lambdaQueryChainWrapper, false)};
@@ -292,7 +294,7 @@ public class SignUtil {
 
             if (sysUserDOArr[0] == null) {
                 // 如果登录的账号不存在，则进行新增
-                Map<RedisKeyEnum, String> accountMap = MapUtil.newHashMap();
+                Map<Enum<? extends IRedisKey>, String> accountMap = MapUtil.newHashMap();
                 accountMap.put(redisKeyEnum, account);
 
                 sysUserDOArr[0] = SignUtil.insertUser(null, accountMap, false, null, null);
@@ -430,8 +432,8 @@ public class SignUtil {
     /**
      * 修改密码
      */
-    public static String updatePassword(String newPassword, String origNewPassword, RedisKeyEnum redisKeyEnum,
-        String code, String oldPassword) {
+    public static String updatePassword(String newPassword, String origNewPassword,
+        Enum<? extends IRedisKey> redisKeyEnum, String code, String oldPassword) {
 
         Long currentUserIdNotAdmin = AuthUserUtil.getCurrentUserIdNotAdmin();
 
@@ -504,7 +506,8 @@ public class SignUtil {
     }
 
     @NotNull
-    private static String getAccountByIdAndRedisKeyEnum(RedisKeyEnum redisKeyEnum, Long currentUserIdNotAdmin) {
+    private static String getAccountByIdAndRedisKeyEnum(Enum<? extends IRedisKey> redisKeyEnum,
+        Long currentUserIdNotAdmin) {
 
         SysUserDO sysUserDO = getSysUserDOByIdAndRedisKeyEnum(redisKeyEnum, currentUserIdNotAdmin);
 
@@ -521,7 +524,8 @@ public class SignUtil {
     }
 
     @NotNull
-    private static SysUserDO getSysUserDOByIdAndRedisKeyEnum(RedisKeyEnum redisKeyEnum, Long currentUserIdNotAdmin) {
+    private static SysUserDO getSysUserDOByIdAndRedisKeyEnum(Enum<? extends IRedisKey> redisKeyEnum,
+        Long currentUserIdNotAdmin) {
 
         LambdaQueryChainWrapper<SysUserDO> lambdaQueryChainWrapper =
             ChainWrappers.lambdaQueryChain(sysUserMapper).eq(BaseEntity::getId, currentUserIdNotAdmin);
@@ -548,8 +552,8 @@ public class SignUtil {
     /**
      * 修改登录账号
      */
-    public static String updateAccount(String oldCode, String newCode, RedisKeyEnum redisKeyEnum, String newAccount,
-        String currentPassword) {
+    public static String updateAccount(String oldCode, String newCode, Enum<? extends IRedisKey> redisKeyEnum,
+        String newAccount, String currentPassword) {
 
         Long currentUserIdNotAdmin = AuthUserUtil.getCurrentUserIdNotAdmin();
 
@@ -615,7 +619,7 @@ public class SignUtil {
     /**
      * 通过：RedisKeyEnum，设置：账号
      */
-    private static void setSysUserDOAccountByRedisKeyEnum(RedisKeyEnum redisKeyEnum, String newAccount,
+    private static void setSysUserDOAccountByRedisKeyEnum(Enum<? extends IRedisKey> redisKeyEnum, String newAccount,
         SysUserDO sysUserDO) {
 
         if (RedisKeyEnum.PRE_EMAIL.equals(redisKeyEnum)) {
@@ -632,7 +636,7 @@ public class SignUtil {
     /**
      * 检查登录账号是否存在
      */
-    public static boolean accountIsExist(RedisKeyEnum redisKeyEnum, String newAccount, Long id) {
+    public static boolean accountIsExist(Enum<? extends IRedisKey> redisKeyEnum, String newAccount, Long id) {
 
         LambdaQueryChainWrapper<SysUserDO> lambdaQueryChainWrapper =
             ChainWrappers.lambdaQueryChain(sysUserMapper).ne(id != null, BaseEntity::getId, id);
@@ -658,7 +662,8 @@ public class SignUtil {
      * 忘记密码
      */
     public static String forgotPassword(String newPassword, String origNewPassword, String code,
-        RedisKeyEnum redisKeyEnum, String account, LambdaQueryChainWrapper<SysUserDO> lambdaQueryChainWrapper) {
+        Enum<? extends IRedisKey> redisKeyEnum, String account,
+        LambdaQueryChainWrapper<SysUserDO> lambdaQueryChainWrapper) {
 
         String paramValue = SysParamUtil.getValueById(ParamConstant.RSA_PRIVATE_KEY_ID); // 获取非对称 私钥
         newPassword = MyRsaUtil.rsaDecrypt(newPassword, paramValue);
@@ -706,7 +711,7 @@ public class SignUtil {
     /**
      * 账号注销
      */
-    public static String signDelete(String code, RedisKeyEnum redisKeyEnum, String currentPassword) {
+    public static String signDelete(String code, Enum<? extends IRedisKey> redisKeyEnum, String currentPassword) {
 
         Long currentUserIdNotAdmin = AuthUserUtil.getCurrentUserIdNotAdmin();
 
@@ -766,7 +771,7 @@ public class SignUtil {
     /**
      * 绑定登录账号
      */
-    public static String bindAccount(String code, RedisKeyEnum redisKeyEnum, String account) {
+    public static String bindAccount(String code, Enum<? extends IRedisKey> redisKeyEnum, String account) {
 
         Long currentUserIdNotAdmin = AuthUserUtil.getCurrentUserIdNotAdmin();
 

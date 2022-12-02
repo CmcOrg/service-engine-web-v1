@@ -23,7 +23,8 @@ import com.cmcorg.engine.web.model.model.constant.ParamConstant;
 import com.cmcorg.engine.web.model.model.dto.NotEmptyIdSet;
 import com.cmcorg.engine.web.model.model.dto.NotNullId;
 import com.cmcorg.engine.web.model.model.vo.DictResultVO;
-import com.cmcorg.engine.web.redisson.enums.RedisKeyEnum;
+import com.cmcorg.engine.web.redisson.model.enums.RedisKeyEnum;
+import com.cmcorg.engine.web.redisson.model.interfaces.IRedisKey;
 import com.cmcorg.engine.web.redisson.util.RedissonUtil;
 import com.cmcorg.engine.web.util.util.MyMapUtil;
 import com.cmcorg.service.engine.web.role.service.SysRoleRefUserService;
@@ -141,7 +142,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
             }
         }
 
-        Set<RedisKeyEnum> redisKeyEnumSet = CollUtil.newHashSet();
+        Set<Enum<? extends IRedisKey>> redisKeyEnumSet = CollUtil.newHashSet();
 
         if (!emailBlank) {
             redisKeyEnumSet.add(RedisKeyEnum.PRE_EMAIL);
@@ -155,10 +156,10 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
 
         return RedissonUtil.doMultiLock("", redisKeyEnumSet, () -> {
 
-            Map<RedisKeyEnum, String> accountMap = MapUtil.newHashMap();
+            Map<Enum<? extends IRedisKey>, String> accountMap = MapUtil.newHashMap();
 
             // 检查：账号是否存在
-            for (RedisKeyEnum item : redisKeyEnumSet) {
+            for (Enum<? extends IRedisKey> item : redisKeyEnumSet) {
                 if (accountIsExist(dto, item, accountMap)) {
                     SignUtil.accountIsExistError();
                 }
@@ -206,7 +207,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
     /**
      * 判断：账号是否重复
      */
-    private boolean accountIsExist(SysUserInsertOrUpdateDTO dto, RedisKeyEnum item, Map<RedisKeyEnum, String> map) {
+    private boolean accountIsExist(SysUserInsertOrUpdateDTO dto, Enum<? extends IRedisKey> item,
+        Map<Enum<? extends IRedisKey>, String> map) {
         boolean exist = false;
         if (RedisKeyEnum.PRE_EMAIL.equals(item)) {
             exist = SignUtil.accountIsExist(item, dto.getEmail(), dto.getId());
