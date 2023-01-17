@@ -5,6 +5,7 @@ import com.cmcorg.engine.web.auth.mapper.SysUserMapper;
 import com.cmcorg.engine.web.auth.model.entity.SysUserDO;
 import com.cmcorg.engine.web.auth.model.entity.SysUserInfoDO;
 import com.cmcorg.engine.web.redisson.model.enums.RedisKeyEnum;
+import com.cmcorg.engine.web.util.util.NicknameUtil;
 import com.cmcorg.engine.web.wx.model.vo.WxOpenIdVO;
 import com.cmcorg.engine.web.wx.model.vo.WxPhoneByCodeVO;
 import com.cmcorg.engine.web.wx.util.WxUtil;
@@ -61,7 +62,7 @@ public class SignWxServiceImpl implements SignWxService {
     private SysUserInfoDO getWxSysUserInfoDO() {
 
         SysUserInfoDO sysUserInfoDO = new SysUserInfoDO();
-        sysUserInfoDO.setNickname(SignUtil.getRandomNickname("微信用户"));
+        sysUserInfoDO.setNickname(NicknameUtil.getRandomNickname("微信用户"));
 
         return sysUserInfoDO;
 
