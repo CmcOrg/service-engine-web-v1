@@ -2,7 +2,10 @@ package com.cmcorg.service.engine.web.sign.helper.util;
 
 import cn.hutool.core.collection.CollUtil;
 import cn.hutool.core.map.MapUtil;
-import cn.hutool.core.util.*;
+import cn.hutool.core.util.BooleanUtil;
+import cn.hutool.core.util.IdUtil;
+import cn.hutool.core.util.ReUtil;
+import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.extension.conditions.query.LambdaQueryChainWrapper;
 import com.baomidou.mybatisplus.extension.toolkit.ChainWrappers;
 import com.cmcorg.engine.web.auth.exception.BaseBizCodeEnum;
@@ -24,6 +27,7 @@ import com.cmcorg.engine.web.model.model.constant.ParamConstant;
 import com.cmcorg.engine.web.redisson.model.enums.RedisKeyEnum;
 import com.cmcorg.engine.web.redisson.model.interfaces.IRedisKey;
 import com.cmcorg.engine.web.redisson.util.RedissonUtil;
+import com.cmcorg.engine.web.util.util.NicknameUtil;
 import com.cmcorg.engine.web.util.util.VoidFunc2;
 import com.cmcorg.service.engine.web.sign.helper.configuration.AbstractSignHelperSecurityPermitAllConfiguration;
 import com.cmcorg.service.engine.web.sign.helper.exception.BizCodeEnum;
@@ -232,11 +236,12 @@ public class SignUtil {
         sysUserInfoDO.setUuid(IdUtil.simpleUUID());
 
         if (tempSysUserInfoDO == null) {
-            sysUserInfoDO.setNickname(getRandomNickname());
+            sysUserInfoDO.setNickname(NicknameUtil.getRandomNickname());
             sysUserInfoDO.setBio("");
             sysUserInfoDO.setAvatarUri("");
         } else {
-            sysUserInfoDO.setNickname(MyEntityUtil.getNotNullStr(tempSysUserInfoDO.getNickname(), getRandomNickname()));
+            sysUserInfoDO.setNickname(
+                MyEntityUtil.getNotNullStr(tempSysUserInfoDO.getNickname(), NicknameUtil.getRandomNickname()));
             sysUserInfoDO.setBio(MyEntityUtil.getNotNullStr(tempSysUserInfoDO.getBio()));
             sysUserInfoDO.setAvatarUri(MyEntityUtil.getNotNullStr(tempSysUserInfoDO.getAvatarUri()));
         }
@@ -804,21 +809,6 @@ public class SignUtil {
 
             return BaseBizCodeEnum.OK;
         });
-    }
-
-    /**
-     * 获取：默认的用户名
-     */
-    public static String getRandomNickname() {
-        return getRandomNickname("用户昵称");
-    }
-
-    /**
-     * 根据前缀获取：默认的用户名
-     * 备注：不使用邮箱的原因，因为邮箱不符合 用户昵称的规则：只能包含中文，数字，字母，下划线，长度2-20
-     */
-    public static String getRandomNickname(String preStr) {
-        return preStr + RandomUtil.randomStringUpper(6);
     }
 
     /**

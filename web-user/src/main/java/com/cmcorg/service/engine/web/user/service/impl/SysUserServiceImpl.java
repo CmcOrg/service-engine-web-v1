@@ -27,6 +27,7 @@ import com.cmcorg.engine.web.redisson.model.enums.RedisKeyEnum;
 import com.cmcorg.engine.web.redisson.model.interfaces.IRedisKey;
 import com.cmcorg.engine.web.redisson.util.RedissonUtil;
 import com.cmcorg.engine.web.util.util.MyMapUtil;
+import com.cmcorg.engine.web.util.util.NicknameUtil;
 import com.cmcorg.service.engine.web.role.service.SysRoleRefUserService;
 import com.cmcorg.service.engine.web.role.service.SysRoleService;
 import com.cmcorg.service.engine.web.sign.helper.util.SignUtil;
@@ -193,7 +194,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserProMapper, SysUserDO>
 
                 SysUserInfoDO sysUserInfoDO = new SysUserInfoDO();
                 sysUserInfoDO.setId(dto.getId());
-                sysUserInfoDO.setNickname(MyEntityUtil.getNotNullStr(dto.getNickname(), SignUtil.getRandomNickname()));
+                sysUserInfoDO
+                    .setNickname(MyEntityUtil.getNotNullStr(dto.getNickname(), NicknameUtil.getRandomNickname()));
                 sysUserInfoDO.setBio(MyEntityUtil.getNotNullStr(dto.getBio()));
                 sysUserInfoDO.setAvatarUri(MyEntityUtil.getNotNullStr(dto.getAvatarUri()));
                 sysUserInfoMapper.updateById(sysUserInfoDO);

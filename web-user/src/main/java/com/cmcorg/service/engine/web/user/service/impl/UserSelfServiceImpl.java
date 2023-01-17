@@ -15,8 +15,8 @@ import com.cmcorg.engine.web.auth.properties.AuthProperties;
 import com.cmcorg.engine.web.auth.util.AuthUserUtil;
 import com.cmcorg.engine.web.auth.util.MyEntityUtil;
 import com.cmcorg.engine.web.model.model.constant.BaseConstant;
+import com.cmcorg.engine.web.util.util.NicknameUtil;
 import com.cmcorg.service.engine.web.sign.helper.model.dto.UserSelfUpdateInfoDTO;
-import com.cmcorg.service.engine.web.sign.helper.util.SignUtil;
 import com.cmcorg.service.engine.web.user.model.vo.UserSelfInfoVO;
 import com.cmcorg.service.engine.web.user.service.UserSelfService;
 import org.springframework.stereotype.Service;
@@ -72,6 +72,7 @@ public class UserSelfServiceImpl extends ServiceImpl<SysUserMapper, SysUserDO> i
         }
 
         return sysUserSelfInfoVO;
+
     }
 
     /**
@@ -84,13 +85,14 @@ public class UserSelfServiceImpl extends ServiceImpl<SysUserMapper, SysUserDO> i
 
         SysUserInfoDO sysUserInfoDO = new SysUserInfoDO();
         sysUserInfoDO.setId(currentUserIdNotAdmin);
-        sysUserInfoDO.setNickname(MyEntityUtil.getNotNullStr(dto.getNickname(), SignUtil.getRandomNickname()));
+        sysUserInfoDO.setNickname(MyEntityUtil.getNotNullStr(dto.getNickname(), NicknameUtil.getRandomNickname()));
         sysUserInfoDO.setBio(MyEntityUtil.getNotNullAndTrimStr(dto.getBio()));
         sysUserInfoDO.setAvatarUri(MyEntityUtil.getNotNullStr(dto.getAvatarUri()));
 
         sysUserInfoMapper.updateById(sysUserInfoDO);
 
         return BaseBizCodeEnum.OK;
+
     }
 
     /**
@@ -106,6 +108,7 @@ public class UserSelfServiceImpl extends ServiceImpl<SysUserMapper, SysUserDO> i
         updateById(sysUserDO);
 
         return BaseBizCodeEnum.OK;
+
     }
 
 }
